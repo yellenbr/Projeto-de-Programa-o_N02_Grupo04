@@ -24,6 +24,11 @@ public class AlunoService {
     }
 
     @Transactional
+    public Aluno salvar(Aluno aluno) {
+        return criar(aluno);
+    }
+
+    @Transactional
     public Aluno criar(Aluno aluno) {
         if (aluno.getNome() == null || aluno.getNome().isBlank())
             throw new IllegalArgumentException("Nome obrigatório");

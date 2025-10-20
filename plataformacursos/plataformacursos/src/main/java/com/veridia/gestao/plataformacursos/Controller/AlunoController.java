@@ -46,7 +46,7 @@ public class AlunoController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         if (alunoService.buscarPorId(id).isPresent()) {
-            alunoService.deletar(id);
+            alunoService.excluir(id);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.notFound().build();
