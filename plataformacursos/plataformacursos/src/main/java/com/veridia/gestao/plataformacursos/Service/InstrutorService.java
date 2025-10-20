@@ -1,6 +1,7 @@
 package com.veridia.gestao.plataformacursos.Service;
 
 import com.veridia.gestao.plataformacursos.Instrutor;
+import com.veridia.gestao.plataformacursos.Repository.CursoRepository;
 import com.veridia.gestao.plataformacursos.Repository.InstrutorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,10 +38,10 @@ public class InstrutorService {
         // Implementar Lógica de Negócio do ADM aqui:
 
         // Exemplo: O ADM só pode deletar um instrutor se ele não tiver cursos ativos.
-        // if (cursoRepository.existsByInstrutorId(id)) {
-        //     throw new RuntimeException("Não é possível deletar. O instrutor possui cursos ativos.");
+        // if (CursoRepository.existsByInstrutorId(id)) {
+        //    throw new RuntimeException("Não é possível deletar. O instrutor possui cursos ativos.");
         // }
 
-        instrutorRepository.deleteById(id);
+       // instrutorRepository.deleteById(id);
     }
 }

@@ -1,4 +1,4 @@
-package com.veridia.plataforma.domain.repository;
+package com.veridia.gestao.plataformacursos.Repository;
 
 import com.veridia.plataforma.domain.model.Curso;
 import org.springframework.data.jpa.repository.JpaRepository;
