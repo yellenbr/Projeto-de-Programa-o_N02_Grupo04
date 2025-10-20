@@ -1,0 +1,197 @@
+# ========================================
+# PROJETO SPRING BOOT - GITIGNORE
+# ========================================
+
+# ========================================
+# Maven
+# ========================================
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# ========================================
+# Spring Boot
+# ========================================
+*.log
+*.gz
+*.tmp
+spring-boot-starter-actuator/
+
+# ========================================
+# Banco de Dados H2 (Local)
+# ========================================
+/data/
+*.db
+*.mv.db
+*.trace.db
+
+# ========================================
+# IDEs
+# ========================================
+
+## IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+*.log
+
+## Eclipse
+.classpath
+.project
+.settings/
+bin/
+.metadata/
+
+## NetBeans
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+## VS Code
+.vscode/
+*.code-workspace
+.history/
+
+# ========================================
+# Sistema Operacional
+# ========================================
+
+## Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+## macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+
+## Linux
+*~
+.directory
+.Trash-*
+
+# ========================================
+# Java
+# ========================================
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+hs_err_pid*
+replay_pid*
+
+# ========================================
+# Logs e Temporários
+# ========================================
+logs/
+*.log
+*.log.*
+temp/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+
+# ========================================
+# Node (caso tenha frontend)
+# ========================================
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# ========================================
+# Arquivos de Configuração Sensíveis
+# ========================================
+application-local.properties
+application-dev.properties
+application-prod.properties
+*.env
+.env.local
+.env.*.local
+
+# ========================================
+# Build e Compilação
+# ========================================
+build/
+dist/
+out/
+generated/
+
+# ========================================
+# Testes
+# ========================================
+*.coverage
+.pytest_cache/
+htmlcov/
+.tox/
+
+# ========================================
+# Documentação Gerada
+# ========================================
+docs/_build/
+site/
+
+# ========================================
+# Outros
+# ========================================
+*.pid
+*.seed
+*.pid.lock
+.npm
+.eslintcache
+.stylelintcache
+.cache
+.parcel-cache
+.next
+.nuxt
+.vuepress/dist
+.serverless/
+.fusebox/
+.dynamodb/
+.tern-port
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# ========================================
+# Específico do Projeto
+# ========================================
+# Arquivos de teste temporários
+test-output/
+*.test
+
+# Backups
+*.backup
+backup/
+
+# Certificados e chaves (NUNCA COMMITAR)
+*.pem
+*.key
+*.crt
+*.p12
+*.jks
