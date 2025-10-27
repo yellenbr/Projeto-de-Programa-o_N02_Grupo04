@@ -1,5 +1,7 @@
 package com.veridia.gestao.plataformacursos.model;
 
+import com.veridia.gestao.plataformacursos.exception.NegocioException;
+import com.veridia.gestao.plataformacursos.exception.ValidacaoException;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -45,6 +47,9 @@ public class Inscricao {
     }
     
     public Inscricao(Aluno aluno, Curso curso) {
+        validarAluno(aluno);
+        validarCurso(curso);
+        
         this.aluno = aluno;
         this.curso = curso;
         this.dataInscricao = LocalDateTime.now();
@@ -64,6 +69,7 @@ public class Inscricao {
     }
     
     public void setAluno(Aluno aluno) {
+        validarAluno(aluno);
         this.aluno = aluno;
     }
     
@@ -72,6 +78,7 @@ public class Inscricao {
     }
     
     public void setCurso(Curso curso) {
+        validarCurso(curso);
         this.curso = curso;
     }
     
@@ -97,5 +104,117 @@ public class Inscricao {
     
     public void setPagamento(Pagamento pagamento) {
         this.pagamento = pagamento;
+    }
+    
+    // Métodos de validação
+    private void validarAluno(Aluno aluno) {
+        if (aluno == null) {
+            throw new ValidacaoException("Aluno não pode ser nulo");
+        }
+    }
+    
+    private void validarCurso(Curso curso) {
+        if (curso == null) {
+            throw new ValidacaoException("Curso não pode ser nulo");
+        }
+    }
+    
+    // Métodos de negócio
+    /**
+     * Confirma o pagamento da inscrição
+     * @param pagamento Objeto de pagamento aprovado
+     * @throws NegocioException se o status não permitir pagamento
+     */
+    public void confirmarPagamento(Pagamento pagamento) {
+        if (this.status != StatusInscricao.PENDENTE) {
+            throw new NegocioException(
+                "Inscrição não está pendente de pagamento. Status atual: " + this.status);
+        }
+        
+        if (pagamento == null) {
+            throw new ValidacaoException("Pagamento não pode ser nulo");
+        }
+        
+        this.pagamento = pagamento;
+        this.status = StatusInscricao.PAGO;
+    }
+    
+    /**
+     * Cancela a inscrição
+     * @return true se houve reembolso, false caso contrário
+     * @throws NegocioException se já estiver cancelada
+     */
+    public boolean cancelar() {
+        if (this.status == StatusInscricao.CANCELADA || 
+            this.status == StatusInscricao.REEMBOLSADA) {
+            throw new NegocioException("Inscrição já está cancelada");
+        }
+        
+        if (this.status == StatusInscricao.CONCLUIDA) {
+            throw new NegocioException("Não é possível cancelar inscrição de curso concluído");
+        }
+        
+        // Se o curso não começou e está pago, gera reembolso
+        boolean temReembolso = !curso.isCursoComecou() && 
+                               this.pagamento != null &&
+                               this.pagamento.getStatus() == Pagamento.StatusPagamento.APROVADO;
+        
+        if (temReembolso) {
+            this.status = StatusInscricao.REEMBOLSADA;
+            this.pagamento.cancelar();
+        } else {
+            this.status = StatusInscricao.CANCELADA;
+        }
+        
+        return temReembolso;
+    }
+    
+    /**
+     * Confirma a inscrição após pagamento
+     */
+    public void confirmar() {
+        if (this.status != StatusInscricao.PAGO) {
+            throw new NegocioException(
+                "Apenas inscrições pagas podem ser confirmadas. Status atual: " + this.status);
+        }
+        this.status = StatusInscricao.CONFIRMADA;
+    }
+    
+    /**
+     * Marca a inscrição como concluída
+     */
+    public void concluir() {
+        if (this.status != StatusInscricao.CONFIRMADA && 
+            this.status != StatusInscricao.PAGO) {
+            throw new NegocioException(
+                "Apenas inscrições confirmadas ou pagas podem ser concluídas");
+        }
+        this.status = StatusInscricao.CONCLUIDA;
+    }
+    
+    /**
+     * Verifica se a inscrição está ativa
+     */
+    public boolean isAtiva() {
+        return this.status == StatusInscricao.PAGO ||
+               this.status == StatusInscricao.CONFIRMADA;
+    }
+    
+    /**
+     * Verifica se pode ser cancelada
+     */
+    public boolean podeCancelar() {
+        return this.status != StatusInscricao.CANCELADA &&
+               this.status != StatusInscricao.REEMBOLSADA &&
+               this.status != StatusInscricao.CONCLUIDA;
+    }
+    
+    /**
+     * Verifica se tem direito a reembolso
+     */
+    public boolean temDireitoReembolso() {
+        return !curso.isCursoComecou() && 
+               this.pagamento != null &&
+               this.pagamento.getStatus() == Pagamento.StatusPagamento.APROVADO;
     }
 }

@@ -1,5 +1,7 @@
 package com.veridia.gestao.plataformacursos.service;
 
+import com.veridia.gestao.plataformacursos.exception.NegocioException;
+import com.veridia.gestao.plataformacursos.exception.RecursoNaoEncontradoException;
 import com.veridia.gestao.plataformacursos.model.Aluno;
 import com.veridia.gestao.plataformacursos.repository.AlunoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +30,10 @@ public class AlunoService {
     
     public Aluno salvar(Aluno aluno) {
         if (alunoRepository.existsByEmail(aluno.getEmail())) {
-            throw new RuntimeException("Email já cadastrado");
+            throw new NegocioException("Email já cadastrado: " + aluno.getEmail());
         }
         if (alunoRepository.existsByCpf(aluno.getCpf())) {
-            throw new RuntimeException("CPF já cadastrado");
+            throw new NegocioException("CPF já cadastrado: " + aluno.getCpf());
         }
         return alunoRepository.save(aluno);
     }
@@ -44,10 +46,13 @@ public class AlunoService {
                 aluno.setCpf(alunoAtualizado.getCpf());
                 return alunoRepository.save(aluno);
             })
-            .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
+            .orElseThrow(() -> new RecursoNaoEncontradoException("Aluno não encontrado com ID: " + id));
     }
     
     public void deletar(Long id) {
+        if (!alunoRepository.existsById(id)) {
+            throw new RecursoNaoEncontradoException("Aluno não encontrado com ID: " + id);
+        }
         alunoRepository.deleteById(id);
     }
 }

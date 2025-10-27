@@ -2,6 +2,8 @@ package com.veridia.gestao.plataformacursos.service;
 
 import com.veridia.gestao.plataformacursos.dto.ReembolsoDTO;
 import com.veridia.gestao.plataformacursos.dto.TransferenciaDTO;
+import com.veridia.gestao.plataformacursos.exception.NegocioException;
+import com.veridia.gestao.plataformacursos.exception.RecursoNaoEncontradoException;
 import com.veridia.gestao.plataformacursos.model.Aluno;
 import com.veridia.gestao.plataformacursos.model.Curso;
 import com.veridia.gestao.plataformacursos.model.Inscricao;
@@ -59,31 +61,26 @@ public class InscricaoService {
     public Inscricao inscrever(Long alunoId, Long cursoId) {
         // Buscar aluno
         Aluno aluno = alunoRepository.findById(alunoId)
-            .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
+            .orElseThrow(() -> new RecursoNaoEncontradoException("Aluno não encontrado com ID: " + alunoId));
         
         // Buscar curso
         Curso curso = cursoRepository.findById(cursoId)
-            .orElseThrow(() -> new RuntimeException("Curso não encontrado"));
+            .orElseThrow(() -> new RecursoNaoEncontradoException("Curso não encontrado com ID: " + cursoId));
         
-        // Verificar se o curso está ativo
-        if (!curso.getAtivo()) {
-            throw new RuntimeException("Curso cancelado ou inativo");
+        // Verificar se o aluno pode se inscrever
+        if (!aluno.podeSeInscrever(curso)) {
+            if (inscricaoRepository.existsByAluno_IdAndCurso_IdAndStatusNot(
+                alunoId, cursoId, Inscricao.StatusInscricao.CANCELADA)) {
+                throw new NegocioException("Aluno já está inscrito neste curso");
+            }
+            throw new NegocioException("Curso sem vagas disponíveis ou inativo");
         }
         
-        // REGRA: Verificar se já está inscrito (não pode inscrever duas vezes)
-        if (inscricaoRepository.existsByAluno_IdAndCurso_IdAndStatusNot(
-            alunoId, cursoId, Inscricao.StatusInscricao.CANCELADA)) {
-            throw new RuntimeException("Aluno já está inscrito neste curso");
-        }
-        
-        // REGRA: Verificar vagas disponíveis (max 60)
-        if (!curso.temVagasDisponiveis()) {
-            throw new RuntimeException("Curso sem vagas disponíveis (limite: " + curso.getVagas() + " alunos)");
-        }
+        // Reservar vaga no curso (valida automaticamente)
+        curso.reservarVaga();
         
         // Criar e salvar inscrição
         Inscricao inscricao = new Inscricao(aluno, curso);
-        inscricao.setStatus(Inscricao.StatusInscricao.PENDENTE);
         
         return inscricaoRepository.save(inscricao);
     }
@@ -95,21 +92,19 @@ public class InscricaoService {
     @Transactional
     public Inscricao processarPagamento(Long inscricaoId, Pagamento.MetodoPagamento metodoPagamento) {
         Inscricao inscricao = inscricaoRepository.findById(inscricaoId)
-            .orElseThrow(() -> new RuntimeException("Inscrição não encontrada"));
-        
-        if (inscricao.getStatus() != Inscricao.StatusInscricao.PENDENTE) {
-            throw new RuntimeException("Inscrição não está pendente de pagamento");
-        }
+            .orElseThrow(() -> new RecursoNaoEncontradoException("Inscrição não encontrada com ID: " + inscricaoId));
         
         // Criar pagamento
         BigDecimal valor = inscricao.getCurso().getPreco();
         Pagamento pagamento = new Pagamento(inscricao, valor, metodoPagamento);
-        pagamento.setStatus(Pagamento.StatusPagamento.APROVADO);
+        
+        // Processar e aprovar pagamento
+        pagamento.processar();
+        pagamento.aprovar();
         pagamentoRepository.save(pagamento);
         
-        // REGRA: Alterar status para PAGO após pagamento confirmado
-        inscricao.setStatus(Inscricao.StatusInscricao.PAGO);
-        inscricao.setPagamento(pagamento);
+        // Confirmar pagamento na inscrição (usa método do model)
+        inscricao.confirmarPagamento(pagamento);
         
         return inscricaoRepository.save(inscricao);
     }
@@ -121,22 +116,17 @@ public class InscricaoService {
     @Transactional
     public ReembolsoDTO cancelarInscricao(Long inscricaoId) {
         Inscricao inscricao = inscricaoRepository.findById(inscricaoId)
-            .orElseThrow(() -> new RuntimeException("Inscrição não encontrada"));
+            .orElseThrow(() -> new RecursoNaoEncontradoException("Inscrição não encontrada com ID: " + inscricaoId));
         
-        if (inscricao.getStatus() == Inscricao.StatusInscricao.CANCELADA) {
-            throw new RuntimeException("Inscrição já está cancelada");
-        }
+        // Cancelar usando método do model (encapsula lógica)
+        boolean temReembolso = inscricao.cancelar();
         
         Curso curso = inscricao.getCurso();
         BigDecimal valorReembolso = BigDecimal.ZERO;
         
-        // REGRA: Reembolso total se curso não começou
-        if (!curso.isCursoComecou() && inscricao.getPagamento() != null) {
+        // Se houve reembolso, obter valor
+        if (temReembolso && inscricao.getPagamento() != null) {
             valorReembolso = inscricao.getPagamento().getValor();
-            inscricao.getPagamento().setStatus(Pagamento.StatusPagamento.CANCELADO);
-            inscricao.setStatus(Inscricao.StatusInscricao.REEMBOLSADA);
-        } else {
-            inscricao.setStatus(Inscricao.StatusInscricao.CANCELADA);
         }
         
         inscricaoRepository.save(inscricao);
@@ -158,36 +148,36 @@ public class InscricaoService {
     @Transactional
     public TransferenciaDTO transferirCurso(Long inscricaoId, Long novoCursoId) {
         Inscricao inscricaoAtual = inscricaoRepository.findById(inscricaoId)
-            .orElseThrow(() -> new RuntimeException("Inscrição não encontrada"));
+            .orElseThrow(() -> new RecursoNaoEncontradoException("Inscrição não encontrada com ID: " + inscricaoId));
         
         Curso novoCurso = cursoRepository.findById(novoCursoId)
-            .orElseThrow(() -> new RuntimeException("Novo curso não encontrado"));
+            .orElseThrow(() -> new RecursoNaoEncontradoException("Novo curso não encontrado com ID: " + novoCursoId));
         
-        // REGRA: Verificar vaga no novo curso
-        if (!novoCurso.temVagasDisponiveis()) {
-            throw new RuntimeException("Curso de destino sem vagas disponíveis");
-        }
-        
-        // Verificar se não está ativo no novo curso
-        if (!novoCurso.getAtivo()) {
-            throw new RuntimeException("Curso de destino está inativo");
-        }
+        // Validar se pode transferir usando método do curso
+        novoCurso.reservarVaga();
         
         String cursoAntigoNome = inscricaoAtual.getCurso().getNome();
         
-        // Cancelar inscrição atual
+        // Cancelar inscrição atual (sem gerar reembolso neste caso)
         inscricaoAtual.setStatus(Inscricao.StatusInscricao.CANCELADA);
         inscricaoRepository.save(inscricaoAtual);
         
         // Criar nova inscrição
         Inscricao novaInscricao = new Inscricao(inscricaoAtual.getAluno(), novoCurso);
         
-        // Transferir pagamento se existir
+        // Transferir status de pagamento se existir
         if (inscricaoAtual.getPagamento() != null && 
-            inscricaoAtual.getPagamento().getStatus() == Pagamento.StatusPagamento.APROVADO) {
-            novaInscricao.setStatus(Inscricao.StatusInscricao.PAGO);
-        } else {
-            novaInscricao.setStatus(Inscricao.StatusInscricao.PENDENTE);
+            inscricaoAtual.getPagamento().isAprovado()) {
+            // Criar novo pagamento para a nova inscrição
+            Pagamento novoPagamento = new Pagamento(
+                novaInscricao, 
+                novoCurso.getPreco(), 
+                inscricaoAtual.getPagamento().getMetodoPagamento()
+            );
+            novoPagamento.aprovar();
+            pagamentoRepository.save(novoPagamento);
+            
+            novaInscricao.confirmarPagamento(novoPagamento);
         }
         
         inscricaoRepository.save(novaInscricao);
