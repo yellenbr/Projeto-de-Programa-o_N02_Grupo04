@@ -1,11 +1,9 @@
 package com.veridia.gestao.plataformacursos.Service;
 
 import com.veridia.gestao.plataformacursos.Instrutor;
-import com.veridia.gestao.plataformacursos.Repository.CursoRepository;
 import com.veridia.gestao.plataformacursos.Repository.InstrutorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -24,24 +22,28 @@ public class InstrutorService {
     }
 
     public Instrutor salvar(Instrutor instrutor) {
-        // Implementar Lógica de Negócio do ADM aqui:
-
-        // Se o seu repositório tiver o método findByEmail, você faria uma validação:
-        // if (instrutorRepository.findByEmail(instrutor.getEmail()).isPresent()) {
-        //     throw new RuntimeException("Já existe um Instrutor cadastrado com este e-mail.");
-        // }
-
         return instrutorRepository.save(instrutor);
     }
 
+    public Instrutor atualizar(Long id, Instrutor instrutorAtualizado) {
+        Optional<Instrutor> instrutorExistente = instrutorRepository.findById(id);
+
+        if (instrutorExistente.isPresent()) {
+            Instrutor instrutor = instrutorExistente.get();
+            instrutor.setNome(instrutorAtualizado.getNome());
+            instrutor.setEmail(instrutorAtualizado.getEmail());
+            instrutor.setEspecialidade(instrutorAtualizado.getEspecialidade());
+            return instrutorRepository.save(instrutor);
+        } else {
+            throw new RuntimeException("Instrutor não encontrado com ID: " + id);
+        }
+    }
+
     public void deletar(Long id) {
-        // Implementar Lógica de Negócio do ADM aqui:
-
-        // Exemplo: O ADM só pode deletar um instrutor se ele não tiver cursos ativos.
-        // if (CursoRepository.existsByInstrutorId(id)) {
-        //    throw new RuntimeException("Não é possível deletar. O instrutor possui cursos ativos.");
-        // }
-
-       // instrutorRepository.deleteById(id);
+        if (instrutorRepository.existsById(id)) {
+            instrutorRepository.deleteById(id);
+        } else {
+            throw new RuntimeException("Instrutor não encontrado com ID: " + id);
+        }
     }
 }
