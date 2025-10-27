@@ -1,6 +1,6 @@
 package com.veridia.gestao.plataformacursos.Repository;
 
-import com.veridia.plataforma.domain.model.Curso;
+import com.veridia.gestao.plataformacursos.Curso;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

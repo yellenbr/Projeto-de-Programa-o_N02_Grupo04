@@ -1,31 +1,33 @@
-package com.veridia.plataforma.domain.model;
+package com.veridia.gestao.plataformacursos;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
+@Table(name = "cursos")
 public class Curso {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String titulo;
+    private String nome;
     private String descricao;
     private BigDecimal preco;
     private Integer limiteVagas;
 
+    @ManyToOne
+    @JoinColumn(name = "instrutor_id")
+    private Instrutor instrutor;
 
     public Curso() {}
 
-    public Curso(String titulo, String descricao, BigDecimal preco, Integer limiteVagas) {
-        this.titulo = titulo;
+    public Curso(String nome, String descricao, BigDecimal preco, Integer limiteVagas, Instrutor instrutor) {
+        this.nome = nome;
         this.descricao = descricao;
         this.preco = preco;
         this.limiteVagas = limiteVagas;
+        this.instrutor = instrutor;
     }
 
     public Long getId() {
@@ -36,12 +38,12 @@ public class Curso {
         this.id = id;
     }
 
-    public String getTitulo() {
-        return titulo;
+    public String getNome() {
+        return nome;
     }
 
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
     public String getDescricao() {
@@ -66,5 +68,13 @@ public class Curso {
 
     public void setLimiteVagas(Integer limiteVagas) {
         this.limiteVagas = limiteVagas;
+    }
+
+    public Instrutor getInstrutor() {
+        return instrutor;
+    }
+
+    public void setInstrutor(Instrutor instrutor) {
+        this.instrutor = instrutor;
     }
 }

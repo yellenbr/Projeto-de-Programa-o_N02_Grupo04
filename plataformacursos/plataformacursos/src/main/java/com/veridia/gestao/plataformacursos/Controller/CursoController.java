@@ -1,12 +1,11 @@
-package com.veridia.plataforma.api.controller;
+package com.veridia.gestao.plataformacursos.Controller;
 
-import com.veridia.plataforma.domain.model.Curso;
-import com.veridia.plataforma.service.CursoService;
+import com.veridia.gestao.plataformacursos.Curso;
+import com.veridia.gestao.plataformacursos.Service.CursoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -16,33 +15,42 @@ public class CursoController {
     @Autowired
     private CursoService cursoService;
 
-
     @GetMapping
-    public List<Curso> listar() {
-        return cursoService.buscarTodos();
+    public ResponseEntity<List<Curso>> listar() {
+        List<Curso> cursos = cursoService.buscarTodos();
+        return new ResponseEntity<>(cursos, HttpStatus.OK);
     }
-
 
     @GetMapping("/{id}")
     public ResponseEntity<Curso> buscarPorId(@PathVariable Long id) {
         return cursoService.buscarPorId(id)
-                .map(curso -> ResponseEntity.ok(curso)) // Retorna 200 OK se encontrar
-                .orElse(ResponseEntity.notFound().build()); // Retorna 404 Not Found se não encontrar
+                .map(curso -> new ResponseEntity<>(curso, HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED) // Retorna 201 Created
-    public Curso criar(@RequestBody Curso curso) {
-        return cursoService.salvar(curso);
+    public ResponseEntity<Curso> criar(@RequestBody Curso curso) {
+        Curso novoCurso = cursoService.salvar(curso);
+        return new ResponseEntity<>(novoCurso, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Curso> atualizar(@PathVariable Long id, @RequestBody Curso curso) {
+        try {
+            Curso cursoAtualizado = cursoService.atualizar(id, curso);
+            return new ResponseEntity<>(cursoAtualizado, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        if (!cursoService.buscarPorId(id).isPresent()) {
-            return ResponseEntity.notFound().build(); // Retorna 404 se não existir
+        try {
+            cursoService.deletar(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        cursoService.deletar(id);
-        return ResponseEntity.noContent().build(); // Retorna 204 No Content
     }
 }

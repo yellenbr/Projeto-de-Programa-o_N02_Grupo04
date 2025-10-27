@@ -15,7 +15,7 @@ public class Instrutor {
     private String nome;
     private String email;
     private String cpf;
-    private String especialidade; // Adicionando um campo relevante para o Instrutor
+    private String especialidade;
 
     public Instrutor() {}
 
