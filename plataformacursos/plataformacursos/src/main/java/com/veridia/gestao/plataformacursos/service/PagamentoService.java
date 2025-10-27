@@ -15,16 +15,13 @@ public class PagamentoService {
     private PagamentoRepository pagamentoRepository;
 
     public Pagamento processarPagamento(Pagamento pagamento) {
-        // Validação simples
+
         if (pagamento.getValor() == null || pagamento.getValor() <= 0) {
             throw new IllegalArgumentException("Valor inválido para pagamento.");
         }
 
-        // Simula aprovação de pagamento
-        pagamento.setStatus(Status.APROVADO);
-        pagamento.setDataPagamento(LocalDateTime.now());
 
-        // Salva no banco
+
         return pagamentoRepository.save(pagamento);
     }
 }

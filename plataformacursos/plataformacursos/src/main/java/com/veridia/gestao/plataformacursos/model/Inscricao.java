@@ -18,5 +18,6 @@ public class Inscricao {
 
     private Long idAluno;
     private Long idCurso;
+    private String tipoInscricao;
     private boolean acessoLiberado;
 }
