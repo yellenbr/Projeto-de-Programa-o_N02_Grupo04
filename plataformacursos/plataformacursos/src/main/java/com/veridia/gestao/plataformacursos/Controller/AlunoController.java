@@ -1,24 +1,24 @@
-package com.veridia.gestao.plataformacursos.Controller;
+package com.veridia.gestao.plataformacursos.controller;
 
-import com.veridia.gestao.plataformacursos.Aluno;
-import com.veridia.gestao.plataformacursos.Service.AlunoService;
+import com.veridia.gestao.plataformacursos.model.Aluno;
+import com.veridia.gestao.plataformacursos.service.AlunoService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
-@RequestMapping("/alunos")
+@RequestMapping("/api/alunos")
 public class AlunoController {
 
-    private final AlunoService alunoService;
-
-    public AlunoController(AlunoService alunoService) {
-        this.alunoService = alunoService;
-    }
+    @Autowired
+    private AlunoService alunoService;
 
     @GetMapping
-    public List<Aluno> listarTodos() {
-        return alunoService.listarTodos();
+    public ResponseEntity<List<Aluno>> listarTodos() {
+        return ResponseEntity.ok(alunoService.listarTodos());
     }
 
     @GetMapping("/{id}")
@@ -28,27 +28,36 @@ public class AlunoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/email/{email}")
+    public ResponseEntity<Aluno> buscarPorEmail(@PathVariable String email) {
+        return alunoService.buscarPorEmail(email)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @PostMapping
-    public Aluno criar(@RequestBody Aluno aluno) {
-        return alunoService.salvar(aluno);
+    public ResponseEntity<Aluno> criar(@RequestBody Aluno aluno) {
+        try {
+            Aluno novoAluno = alunoService.salvar(aluno);
+            return ResponseEntity.status(HttpStatus.CREATED).body(novoAluno);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Aluno> atualizar(@PathVariable Long id, @RequestBody Aluno aluno) {
-        return alunoService.buscarPorId(id)
-                .map(existente -> {
-                    aluno.setId(id);
-                    return ResponseEntity.ok(alunoService.salvar(aluno));
-                })
-                .orElse(ResponseEntity.notFound().build());
+        try {
+            Aluno alunoAtualizado = alunoService.atualizar(id, aluno);
+            return ResponseEntity.ok(alunoAtualizado);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        if (alunoService.buscarPorId(id).isPresent()) {
-            alunoService.excluir(id);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+        alunoService.deletar(id);
+        return ResponseEntity.noContent().build();
     }
 }
