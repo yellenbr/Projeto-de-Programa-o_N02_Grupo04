@@ -1,6 +1,6 @@
 package com.veridia.gestao.plataformacursos.Controller;
 
-import com.veridia.gestao.plataformacursos.Aluno;
+import com.veridia.gestao.plataformacursos.Model.Aluno;
 import com.veridia.gestao.plataformacursos.Service.AlunoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

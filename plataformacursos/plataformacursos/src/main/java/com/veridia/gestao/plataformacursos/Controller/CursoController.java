@@ -1,6 +1,6 @@
 package com.veridia.gestao.plataformacursos.Controller;
 
-import com.veridia.gestao.plataformacursos.Curso;
+import com.veridia.gestao.plataformacursos.Model.Curso;
 import com.veridia.gestao.plataformacursos.Service.CursoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
