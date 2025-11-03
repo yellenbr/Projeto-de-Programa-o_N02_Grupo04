@@ -1,19 +1,20 @@
 package com.veridia.gestao.plataformacursos.Service;
 
-import com.veridia.gestao.plataformacursos.Aluno;
-import com.veridia.gestao.plataformacursos.Repository.AlunoRepository;
+import com.veridia.gestao.plataformacursos.exception.NegocioException;
+import com.veridia.gestao.plataformacursos.exception.RecursoNaoEncontradoException;
+import com.veridia.gestao.plataformacursos.model.Aluno;
+import com.veridia.gestao.plataformacursos.repository.AlunoRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class AlunoService {
-    private final AlunoRepository alunoRepository;
 
-    public AlunoService(AlunoRepository alunoRepository) {
-        this.alunoRepository = alunoRepository;
-    }
+    @Autowired
+    private AlunoRepository alunoRepository;
 
     public List<Aluno> listarTodos() {
         return alunoRepository.findAll();
@@ -23,48 +24,35 @@ public class AlunoService {
         return alunoRepository.findById(id);
     }
 
-    @Transactional
+    public Optional<Aluno> buscarPorEmail(String email) {
+        return alunoRepository.findByEmail(email);
+    }
+
     public Aluno salvar(Aluno aluno) {
-        return criar(aluno);
-    }
-
-    @Transactional
-    public Aluno criar(Aluno aluno) {
-        if (aluno.getNome() == null || aluno.getNome().isBlank())
-            throw new IllegalArgumentException("Nome obrigatório");
-
-        if (alunoRepository.existsByCpf(aluno.getCpf()))
-            throw new IllegalArgumentException("CPF já cadastrado");
-
-        if (alunoRepository.existsByEmail(aluno.getEmail()))
-            throw new IllegalArgumentException("E-mail já cadastrado");
-
+        if (alunoRepository.existsByEmail(aluno.getEmail())) {
+            throw new NegocioException("Email já cadastrado: " + aluno.getEmail());
+        }
+        if (alunoRepository.existsByCpf(aluno.getCpf())) {
+            throw new NegocioException("CPF já cadastrado: " + aluno.getCpf());
+        }
         return alunoRepository.save(aluno);
     }
 
-    @Transactional
-    public Aluno atualizar(Long id, Aluno novoAluno) {
-        Aluno aluno = alunoRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Aluno não encontrado"));
-
-        if (!aluno.getCpf().equals(novoAluno.getCpf()) &&
-                alunoRepository.existsByCpf(novoAluno.getCpf()))
-            throw new IllegalArgumentException("CPF já cadastrado");
-
-        if (!aluno.getEmail().equals(novoAluno.getEmail()) &&
-                alunoRepository.existsByEmail(novoAluno.getEmail()))
-            throw new IllegalArgumentException("E-mail já cadastrado");
-
-        aluno.setNome(novoAluno.getNome());
-        aluno.setEmail(novoAluno.getEmail());
-        aluno.setCpf(novoAluno.getCpf());
-        return alunoRepository.save(aluno);
+    public Aluno atualizar(Long id, Aluno alunoAtualizado) {
+        return alunoRepository.findById(id)
+                .map(aluno -> {
+                    aluno.setNome(alunoAtualizado.getNome());
+                    aluno.setEmail(alunoAtualizado.getEmail());
+                    aluno.setCpf(alunoAtualizado.getCpf());
+                    return alunoRepository.save(aluno);
+                })
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Aluno não encontrado com ID: " + id));
     }
 
-    @Transactional
-    public void excluir(Long id) {
-        if (!alunoRepository.existsById(id))
-            throw new IllegalArgumentException("Aluno não encontrado");
+    public void deletar(Long id) {
+        if (!alunoRepository.existsById(id)) {
+            throw new RecursoNaoEncontradoException("Aluno não encontrado com ID: " + id);
+        }
         alunoRepository.deleteById(id);
     }
 }

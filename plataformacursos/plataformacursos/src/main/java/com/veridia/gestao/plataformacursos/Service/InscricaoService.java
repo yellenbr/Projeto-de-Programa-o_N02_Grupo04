@@ -1,4 +1,4 @@
-package com.veridia.gestao.plataformacursos.service;
+package com.veridia.gestao.plataformacursos.Service;
 
 import com.veridia.gestao.plataformacursos.dto.ReembolsoDTO;
 import com.veridia.gestao.plataformacursos.dto.TransferenciaDTO;
@@ -194,5 +194,5 @@ public class InscricaoService {
     @Transactional
     public void deletar(Long id) {
         inscricaoRepository.deleteById(id);
-}
+    }
 }

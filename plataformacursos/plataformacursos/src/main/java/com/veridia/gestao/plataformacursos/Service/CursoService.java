@@ -1,15 +1,12 @@
 package com.veridia.gestao.plataformacursos.Service;
 
-import com.veridia.gestao.plataformacursos.Curso;
-import com.veridia.gestao.plataformacursos.Repository.CursoRepository;
-import jakarta.persistence.EntityNotFoundException;
+import com.veridia.gestao.plataformacursos.model.Curso;
+import com.veridia.gestao.plataformacursos.repository.CursoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-
 
 @Service
 public class CursoService {
@@ -17,7 +14,7 @@ public class CursoService {
     @Autowired
     private CursoRepository cursoRepository;
 
-    public List<Curso> buscarTodos() {
+    public List<Curso> listarTodos() {
         return cursoRepository.findAll();
     }
 
@@ -25,29 +22,32 @@ public class CursoService {
         return cursoRepository.findById(id);
     }
 
-    @Transactional
+    public List<Curso> buscarPorNome(String nome) {
+        return cursoRepository.findByNomeContainingIgnoreCase(nome);
+    }
+
+    public List<Curso> buscarPorInstrutor(Long instrutorId) {
+        return cursoRepository.findByInstrutor_Id(instrutorId);
+    }
+
     public Curso salvar(Curso curso) {
         return cursoRepository.save(curso);
     }
 
-    @Transactional
     public Curso atualizar(Long id, Curso cursoAtualizado) {
-        Curso curso = cursoRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Curso não encontrado com ID: " + id));
-
-        curso.setNome(cursoAtualizado.getNome());
-        curso.setDescricao(cursoAtualizado.getDescricao());
-        curso.setPreco(cursoAtualizado.getPreco());
-        curso.setLimiteVagas(cursoAtualizado.getLimiteVagas());
-        curso.setInstrutor(cursoAtualizado.getInstrutor());
-        return cursoRepository.save(curso);
+        return cursoRepository.findById(id)
+                .map(curso -> {
+                    curso.setNome(cursoAtualizado.getNome());
+                    curso.setDescricao(cursoAtualizado.getDescricao());
+                    curso.setPreco(cursoAtualizado.getPreco());
+                    curso.setCargaHoraria(cursoAtualizado.getCargaHoraria());
+                    curso.setInstrutor(cursoAtualizado.getInstrutor());
+                    return cursoRepository.save(curso);
+                })
+                .orElseThrow(() -> new RuntimeException("Curso não encontrado"));
     }
 
-    @Transactional
     public void deletar(Long id) {
-        if (!cursoRepository.existsById(id)) {
-            throw new EntityNotFoundException("Curso não encontrado com ID: " + id);
-        }
         cursoRepository.deleteById(id);
     }
 }
