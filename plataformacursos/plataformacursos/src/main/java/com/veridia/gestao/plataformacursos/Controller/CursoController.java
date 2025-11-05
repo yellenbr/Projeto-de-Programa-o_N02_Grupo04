@@ -1,11 +1,12 @@
-package com.veridia.gestao.plataformacursos.Controller;
+package com.veridia.gestao.plataformacursos.controller;
 
-import com.veridia.gestao.plataformacursos.Model.Curso;
-import com.veridia.gestao.plataformacursos.Service.CursoService;
+import com.veridia.gestao.plataformacursos.model.Curso;
+import com.veridia.gestao.plataformacursos.service.CursoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -16,41 +17,46 @@ public class CursoController {
     private CursoService cursoService;
 
     @GetMapping
-    public ResponseEntity<List<Curso>> listar() {
-        List<Curso> cursos = cursoService.buscarTodos();
-        return new ResponseEntity<>(cursos, HttpStatus.OK);
+    public ResponseEntity<List<Curso>> listarTodos() {
+        return ResponseEntity.ok(cursoService.listarTodos());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Curso> buscarPorId(@PathVariable Long id) {
         return cursoService.buscarPorId(id)
-                .map(curso -> new ResponseEntity<>(curso, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/buscar")
+    public ResponseEntity<List<Curso>> buscarPorNome(@RequestParam String nome) {
+        return ResponseEntity.ok(cursoService.buscarPorNome(nome));
+    }
+
+    @GetMapping("/instrutor/{instrutorId}")
+    public ResponseEntity<List<Curso>> buscarPorInstrutor(@PathVariable Long instrutorId) {
+        return ResponseEntity.ok(cursoService.buscarPorInstrutor(instrutorId));
     }
 
     @PostMapping
     public ResponseEntity<Curso> criar(@RequestBody Curso curso) {
         Curso novoCurso = cursoService.salvar(curso);
-        return new ResponseEntity<>(novoCurso, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(novoCurso);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Curso> atualizar(@PathVariable Long id, @RequestBody Curso curso) {
         try {
             Curso cursoAtualizado = cursoService.atualizar(id, curso);
-            return new ResponseEntity<>(cursoAtualizado, HttpStatus.OK);
+            return ResponseEntity.ok(cursoAtualizado);
         } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return ResponseEntity.notFound().build();
         }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        try {
-            cursoService.deletar(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        cursoService.deletar(id);
+        return ResponseEntity.noContent().build();
     }
 }
