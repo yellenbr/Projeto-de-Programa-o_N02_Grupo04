@@ -1,9 +1,8 @@
-package com.veridia.gestao.plataformacursos.Model;
+package com.veridia.gestao.plataformacursos.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Aluno {
@@ -15,6 +14,10 @@ public class Aluno {
     private String nome;
     private String email;
     private String cpf;
+    private Integer numeroCursosAtivos = 0;
+
+    @OneToMany(mappedBy = "aluno", cascade = CascadeType.ALL)
+    private List<Inscricao> inscricoes = new ArrayList<>();
 
     public Aluno() {}
 
@@ -54,6 +57,33 @@ public class Aluno {
 
     public void setCpf(String cpf) {
         this.cpf = cpf;
+    }
+
+    public Integer getNumeroCursosAtivos() {
+        return numeroCursosAtivos;
+    }
+
+    public void setNumeroCursosAtivos(Integer numeroCursosAtivos) {
+        this.numeroCursosAtivos = numeroCursosAtivos;
+    }
+
+    public List<Inscricao> getInscricoes() {
+        return inscricoes;
+    }
+
+    public void setInscricoes(List<Inscricao> inscricoes) {
+        this.inscricoes = inscricoes;
+    }
+
+    // Métodos de negócio
+    public boolean podeSeInscrever(Curso curso) {
+        // Limite máximo de 5 cursos ativos por aluno
+        return numeroCursosAtivos < 5;
+    }
+
+    public boolean temInscricoesPendentes() {
+        return inscricoes.stream()
+                .anyMatch(i -> i.getStatus() == Inscricao.StatusInscricao.PENDENTE);
     }
 }
 

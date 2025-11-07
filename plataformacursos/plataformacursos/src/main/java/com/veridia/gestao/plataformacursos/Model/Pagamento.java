@@ -1,4 +1,4 @@
-package com.veridia.gestao.plataformacursos.Model;
+package com.veridia.gestao.plataformacursos.model;
 
 import com.veridia.gestao.plataformacursos.exception.NegocioException;
 import com.veridia.gestao.plataformacursos.exception.ValidacaoException;

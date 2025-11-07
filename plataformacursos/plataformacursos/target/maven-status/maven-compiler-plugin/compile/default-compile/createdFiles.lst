@@ -1,4 +1,5 @@
 com\veridia\gestao\plataformacursos\model\Inscricao$StatusInscricao.class
+com\veridia\gestao\plataformacursos\PlataformacursosApplication.class
 com\veridia\gestao\plataformacursos\repository\PagamentoRepository.class
 com\veridia\gestao\plataformacursos\model\Pagamento$MetodoPagamento.class
 com\veridia\gestao\plataformacursos\repository\CursoRepository.class

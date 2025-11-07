@@ -14,25 +14,25 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/instrutores")
 public class InstrutorController {
-    
+
     @Autowired
     private InstrutorService instrutorService;
-    
-    
+
+
     @GetMapping
     public ResponseEntity<List<Instrutor>> listarTodos() {
         return ResponseEntity.ok(instrutorService.listarTodos());
     }
-    
+
 
     @GetMapping("/{id}")
     public ResponseEntity<Instrutor> buscarPorId(@PathVariable Long id) {
         return instrutorService.buscarPorId(id)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
-    
-   
+
+
     @PostMapping
     public ResponseEntity<?> cadastrar(@RequestBody Instrutor instrutor) {
         try {
@@ -42,7 +42,7 @@ public class InstrutorController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-    
+
     @PutMapping("/{id}")
     public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody Instrutor instrutor) {
         try {
@@ -52,7 +52,7 @@ public class InstrutorController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-    
+
     @PostMapping("/{id}/cursos/{cursoId}")
     public ResponseEntity<?> vincularCurso(@PathVariable Long id, @PathVariable Long cursoId) {
         try {
@@ -62,7 +62,7 @@ public class InstrutorController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-    
+
     @DeleteMapping("/{id}/cursos/{cursoId}")
     public ResponseEntity<?> cancelarCurso(@PathVariable Long id, @PathVariable Long cursoId) {
         try {
@@ -72,7 +72,7 @@ public class InstrutorController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-    
+
     @GetMapping("/{id}/cursos")
     public ResponseEntity<List<Curso>> listarCursos(@PathVariable Long id) {
         try {
@@ -82,7 +82,7 @@ public class InstrutorController {
             return ResponseEntity.notFound().build();
         }
     }
-    
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         instrutorService.deletar(id);

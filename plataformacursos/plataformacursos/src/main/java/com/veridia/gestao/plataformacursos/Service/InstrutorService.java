@@ -1,4 +1,4 @@
-package com.veridia.gestao.plataformacursos.Service;
+package com.veridia.gestao.plataformacursos.service;
 
 import com.veridia.gestao.plataformacursos.dto.ReembolsoDTO;
 import com.veridia.gestao.plataformacursos.model.Curso;

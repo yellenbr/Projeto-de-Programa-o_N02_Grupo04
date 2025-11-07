@@ -1,6 +1,40 @@
 // API Base URL
 const API_URL = 'http://localhost:8080/api';
 
+// Verificar autenticação ao carregar (apenas para index.html - admin)
+if (window.location.pathname.includes('index.html') || window.location.pathname === '/' || window.location.pathname === '') {
+    window.addEventListener('DOMContentLoaded', () => {
+        const sessionData = localStorage.getItem('session');
+        if (!sessionData) {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        const session = JSON.parse(sessionData);
+        if (session.tipo !== 'admin') {
+            alert('Acesso negado! Esta área é exclusiva para administradores.');
+            window.location.href = 'login.html';
+            return;
+        }
+    });
+}
+
+// Função de logout
+function logout() {
+    if (confirm('Deseja realmente sair?')) {
+        localStorage.removeItem('session');
+        window.location.href = 'login.html';
+    }
+}
+
+// Função de voltar ao login (trocar conta)
+function voltarLogin() {
+    if (confirm('Deseja voltar para a tela de login? Você será desconectado.')) {
+        localStorage.removeItem('session');
+        window.location.href = 'login.html';
+    }
+}
+
 // Funções de Navegação
 function showSection(sectionId) {
     // Esconder todas as seções

@@ -12,40 +12,40 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/pagamentos")
 public class PagamentoController {
-    
+
     @Autowired
     private PagamentoService pagamentoService;
-    
+
     @GetMapping
     public ResponseEntity<List<Pagamento>> listarTodos() {
         return ResponseEntity.ok(pagamentoService.listarTodos());
     }
-    
+
     @GetMapping("/{id}")
     public ResponseEntity<Pagamento> buscarPorId(@PathVariable Long id) {
         return pagamentoService.buscarPorId(id)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
-    
+
     @GetMapping("/inscricao/{inscricaoId}")
     public ResponseEntity<Pagamento> buscarPorInscricao(@PathVariable Long inscricaoId) {
         return pagamentoService.buscarPorInscricao(inscricaoId)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
-    
+
     @GetMapping("/status/{status}")
     public ResponseEntity<List<Pagamento>> buscarPorStatus(@PathVariable Pagamento.StatusPagamento status) {
         return ResponseEntity.ok(pagamentoService.buscarPorStatus(status));
     }
-    
+
     @PostMapping
     public ResponseEntity<Pagamento> criar(@RequestBody Pagamento pagamento) {
         Pagamento novoPagamento = pagamentoService.salvar(pagamento);
         return ResponseEntity.status(HttpStatus.CREATED).body(novoPagamento);
     }
-    
+
     @PatchMapping("/{id}/processar")
     public ResponseEntity<Pagamento> processar(@PathVariable Long id) {
         try {
@@ -55,7 +55,7 @@ public class PagamentoController {
             return ResponseEntity.notFound().build();
         }
     }
-    
+
     @PatchMapping("/{id}/aprovar")
     public ResponseEntity<Pagamento> aprovar(@PathVariable Long id) {
         try {
@@ -65,7 +65,7 @@ public class PagamentoController {
             return ResponseEntity.notFound().build();
         }
     }
-    
+
     @PatchMapping("/{id}/recusar")
     public ResponseEntity<Pagamento> recusar(@PathVariable Long id) {
         try {
@@ -75,7 +75,7 @@ public class PagamentoController {
             return ResponseEntity.notFound().build();
         }
     }
-    
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         pagamentoService.deletar(id);

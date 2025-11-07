@@ -12,29 +12,29 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/alunos")
 public class AlunoController {
-    
+
     @Autowired
     private AlunoService alunoService;
-    
+
     @GetMapping
     public ResponseEntity<List<Aluno>> listarTodos() {
         return ResponseEntity.ok(alunoService.listarTodos());
     }
-    
+
     @GetMapping("/{id}")
     public ResponseEntity<Aluno> buscarPorId(@PathVariable Long id) {
         return alunoService.buscarPorId(id)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
-    
+
     @GetMapping("/email/{email}")
     public ResponseEntity<Aluno> buscarPorEmail(@PathVariable String email) {
         return alunoService.buscarPorEmail(email)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
-    
+
     @PostMapping
     public ResponseEntity<Aluno> criar(@RequestBody Aluno aluno) {
         try {
@@ -44,7 +44,7 @@ public class AlunoController {
             return ResponseEntity.badRequest().build();
         }
     }
-    
+
     @PutMapping("/{id}")
     public ResponseEntity<Aluno> atualizar(@PathVariable Long id, @RequestBody Aluno aluno) {
         try {
@@ -54,7 +54,7 @@ public class AlunoController {
             return ResponseEntity.notFound().build();
         }
     }
-    
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         alunoService.deletar(id);

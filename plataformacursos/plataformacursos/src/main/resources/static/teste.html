@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Credenciais - Veridia</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            padding: 2rem;
+            background: #f5f5f5;
+        }
+        .teste-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .teste-section {
+            margin: 2rem 0;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+        }
+        .btn-test {
+            margin: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .btn-test:hover {
+            background: #1d4ed8;
+        }
+        pre {
+            background: #f9fafb;
+            padding: 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="teste-container">
+        <h1>🔧 Teste de Credenciais e Debug</h1>
+        <p>Use esta página para verificar se os usuários de teste existem e suas credenciais.</p>
+
+        <div class="teste-section">
+            <h2>📋 Verificar Usuários no Sistema</h2>
+            <button class="btn-test" onclick="listarAlunos()">Listar Alunos</button>
+            <button class="btn-test" onclick="listarInstrutores()">Listar Instrutores</button>
+            <button class="btn-test" onclick="criarUsuariosTeste()">Criar Usuários de Teste</button>
+            <button class="btn-test" onclick="limparSessao()">Limpar Sessão</button>
+            <div id="resultado" style="margin-top: 1rem;"></div>
+        </div>
+
+        <div class="teste-section">
+            <h2>Credenciais de Teste</h2>
+            <h3>Aluno</h3>
+            <pre>Email: aluno@teste.com
+CPF: 11111111111</pre>
+
+            <h3>Instrutor</h3>
+            <pre>Email: instrutor@teste.com
+Senha (CPF): 22222222222</pre>
+
+            <h3>Admin</h3>
+            <pre>Usuário: admin
+Senha: admin123</pre>
+        </div>
+
+        <div class="teste-section">
+            <h2>Sessão Atual</h2>
+            <div id="sessaoAtual"></div>
+        </div>
+
+        <div style="margin-top: 2rem; text-align: center;">
+            <a href="login.html" class="btn-test" style="display: inline-block; text-decoration: none;">
+                ← Voltar ao Login
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8080/api';
+
+        async function listarAlunos() {
+            try {
+                const response = await fetch(`${API_URL}/alunos`);
+                const alunos = await response.json();
+                
+                let html = '<h3>Alunos Cadastrados:</h3>';
+                if (alunos.length === 0) {
+                    html += '<p style="color: orange;">Nenhum aluno encontrado!</p>';
+                } else {
+                    html += '<pre>' + JSON.stringify(alunos, null, 2) + '</pre>';
+                }
+                
+                document.getElementById('resultado').innerHTML = html;
+            } catch (error) {
+                document.getElementById('resultado').innerHTML = '<p style="color: red;">Erro: ' + error.message + '</p>';
+            }
+        }
+
+        async function listarInstrutores() {
+            try {
+                const response = await fetch(`${API_URL}/instrutores`);
+                const instrutores = await response.json();
+                
+                let html = '<h3>Instrutores Cadastrados:</h3>';
+                if (instrutores.length === 0) {
+                    html += '<p style="color: orange;">Nenhum instrutor encontrado!</p>';
+                } else {
+                    html += '<pre>' + JSON.stringify(instrutores, null, 2) + '</pre>';
+                }
+                
+                document.getElementById('resultado').innerHTML = html;
+            } catch (error) {
+                document.getElementById('resultado').innerHTML = '<p style="color: red;">Erro: ' + error.message + '</p>';
+            }
+        }
+
+        async function criarUsuariosTeste() {
+            try {
+                let resultados = [];
+
+                // Verificar/Criar Aluno de Teste
+                const alunosResp = await fetch(`${API_URL}/alunos`);
+                const alunos = await alunosResp.json();
+                let alunoTeste = alunos.find(a => a.email === 'aluno@teste.com');
+                
+                if (!alunoTeste) {
+                    const criarAlunoResp = await fetch(`${API_URL}/alunos`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            nome: 'Aluno de Teste',
+                            email: 'aluno@teste.com',
+                            cpf: '11111111111'
+                        })
+                    });
+                    alunoTeste = await criarAlunoResp.json();
+                    resultados.push('Aluno de teste criado: ' + JSON.stringify(alunoTeste));
+                } else {
+                    resultados.push('ℹAluno de teste já existe: ' + JSON.stringify(alunoTeste));
+                }
+
+                // Verificar/Criar Instrutor de Teste
+                const instrutoresResp = await fetch(`${API_URL}/instrutores`);
+                const instrutores = await instrutoresResp.json();
+                let instrutorTeste = instrutores.find(i => i.email === 'instrutor@teste.com');
+                
+                if (!instrutorTeste) {
+                    const criarInstrutorResp = await fetch(`${API_URL}/instrutores`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            nome: 'Instrutor de Teste',
+                            email: 'instrutor@teste.com',
+                            cpf: '22222222222',
+                            especialidade: 'Tecnologia'
+                        })
+                    });
+                    instrutorTeste = await criarInstrutorResp.json();
+                    resultados.push('Instrutor de teste criado: ' + JSON.stringify(instrutorTeste));
+                } else {
+                    resultados.push('Instrutor de teste já existe: ' + JSON.stringify(instrutorTeste));
+                }
+
+                document.getElementById('resultado').innerHTML = '<pre>' + resultados.join('\n\n') + '</pre>';
+            } catch (error) {
+                document.getElementById('resultado').innerHTML = '<p style="color: red;">Erro: ' + error.message + '</p>';
+            }
+        }
+
+        function limparSessao() {
+            localStorage.removeItem('session');
+            mostrarSessao();
+            document.getElementById('resultado').innerHTML = '<p style="color: green;"> Sessão limpa com sucesso!</p>';
+        }
+
+        function mostrarSessao() {
+            const session = localStorage.getItem('session');
+            const div = document.getElementById('sessaoAtual');
+            
+            if (session) {
+                const sessionData = JSON.parse(session);
+                div.innerHTML = `
+                    <p><strong>Tipo:</strong> ${sessionData.tipo}</p>
+                    <p><strong>Usuário:</strong></p>
+                    <pre>${JSON.stringify(sessionData.usuario, null, 2)}</pre>
+                    <p><strong>Login em:</strong> ${new Date(sessionData.loginTime).toLocaleString('pt-BR')}</p>
+                `;
+            } else {
+                div.innerHTML = '<p style="color: gray;">Nenhuma sessão ativa</p>';
+            }
+        }
+
+        // Mostrar sessão ao carregar
+        window.addEventListener('load', mostrarSessao);
+    </script>
+</body>
+</html>

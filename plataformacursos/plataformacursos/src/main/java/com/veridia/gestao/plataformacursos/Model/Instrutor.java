@@ -1,4 +1,4 @@
-package com.veridia.gestao.plataformacursos.Model;
+package com.veridia.gestao.plataformacursos.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

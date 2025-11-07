@@ -5,20 +5,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Veridia - Plataforma de Cursos</title>
     <link rel="stylesheet" href="css/style.css">
+    <script>
+        // Funções necessárias antes do carregamento da página
+        function logout() {
+            if (confirm('Deseja realmente sair?')) {
+                localStorage.removeItem('session');
+                window.location.href = 'login.html';
+            }
+        }
+
+        function voltarLogin() {
+            if (confirm('Deseja voltar para a tela de login? Você será desconectado.')) {
+                localStorage.removeItem('session');
+                window.location.href = 'login.html';
+            }
+        }
+    </script>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🎓 Veridia - Plataforma de Cursos</h1>
-            <p>Sistema de Gestão de Cursos Online</p>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1>⚙️ Painel Administrativo - Veridia</h1>
+                    <p>Sistema de Gestão de Cursos Online - Área do Administrador</p>
+                </div>
+                <button onclick="logout()" class="btn-outline" title="Sair do sistema">
+                    🚪 Sair
+                </button>
+            </div>
         </header>
 
         <nav class="menu">
-            <button onclick="showSection('dashboard')" class="nav-btn active">📊 Dashboard</button>
-            <button onclick="showSection('alunos')" class="nav-btn">👥 Alunos</button>
-            <button onclick="showSection('cursos')" class="nav-btn">📚 Cursos</button>
-            <button onclick="showSection('instrutores')" class="nav-btn">👨‍🏫 Instrutores</button>
-            <button onclick="showSection('inscricoes')" class="nav-btn">📝 Inscrições</button>
+            <button onclick="showSection('dashboard')" class="nav-btn active">
+                <span>📊</span> Dashboard
+            </button>
+            <button onclick="showSection('alunos')" class="nav-btn">
+                <span>👥</span> Alunos
+            </button>
+            <button onclick="showSection('cursos')" class="nav-btn">
+                <span>📚</span> Cursos
+            </button>
+            <button onclick="showSection('instrutores')" class="nav-btn">
+                <span>👨‍🏫</span> Instrutores
+            </button>
+            <button onclick="showSection('inscricoes')" class="nav-btn">
+                <span>📝</span> Inscrições
+            </button>
         </nav>
 
         <!-- DASHBOARD -->
@@ -68,11 +101,36 @@
             <h2>👥 Gerenciar Alunos</h2>
             
             <div class="actions">
-                <button onclick="showModalAluno()" class="btn-primary">➕ Novo Aluno</button>
-                <button onclick="carregarAlunos()" class="btn-secondary">🔄 Atualizar</button>
+                <button onclick="showModalAluno()" class="btn-primary">
+                    <span>➕</span> Novo Aluno
+                </button>
+                <button onclick="carregarAlunos()" class="btn-outline">
+                    <span>🔄</span> Atualizar
+                </button>
             </div>
 
-            <div id="listaAlunos" class="data-list"></div>
+            <div id="listaAlunos" class="data-list">
+                <div class="empty-state">
+                    <div class="empty-state-icon">👥</div>
+                    <h3>Nenhum aluno cadastrado</h3>
+                    <p>Clique no botão "Novo Aluno" acima para começar a adicionar alunos à plataforma.</p>
+                </div>
+            </div>
+
+            <div class="stats-grid" style="margin-top: 2rem;">
+                <div class="stat-card">
+                    <h3 id="totalAlunosCard">0</h3>
+                    <p>Total de Alunos</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="alunosAtivos">0</h3>
+                    <p>Ativos</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="alunosNovos">0</h3>
+                    <p>Novos este mês</p>
+                </div>
+            </div>
         </section>
 
         <!-- CURSOS -->
@@ -80,11 +138,21 @@
             <h2>📚 Gerenciar Cursos</h2>
             
             <div class="actions">
-                <button onclick="showModalCurso()" class="btn-primary">➕ Novo Curso</button>
-                <button onclick="carregarCursos()" class="btn-secondary">🔄 Atualizar</button>
+                <button onclick="showModalCurso()" class="btn-primary">
+                    <span>➕</span> Novo Curso
+                </button>
+                <button onclick="carregarCursos()" class="btn-outline">
+                    <span>🔄</span> Atualizar
+                </button>
             </div>
 
-            <div id="listaCursos" class="data-list"></div>
+            <div id="listaCursos" class="data-list">
+                <div class="empty-state">
+                    <div class="empty-state-icon">📚</div>
+                    <h3>Nenhum curso cadastrado</h3>
+                    <p>Clique no botão "Novo Curso" acima para começar a adicionar cursos à plataforma.</p>
+                </div>
+            </div>
         </section>
 
         <!-- INSTRUTORES -->
@@ -92,11 +160,21 @@
             <h2>👨‍🏫 Gerenciar Instrutores</h2>
             
             <div class="actions">
-                <button onclick="showModalInstrutor()" class="btn-primary">➕ Novo Instrutor</button>
-                <button onclick="carregarInstrutores()" class="btn-secondary">🔄 Atualizar</button>
+                <button onclick="showModalInstrutor()" class="btn-primary">
+                    <span>➕</span> Novo Instrutor
+                </button>
+                <button onclick="carregarInstrutores()" class="btn-outline">
+                    <span>🔄</span> Atualizar
+                </button>
             </div>
 
-            <div id="listaInstrutores" class="data-list"></div>
+            <div id="listaInstrutores" class="data-list">
+                <div class="empty-state">
+                    <div class="empty-state-icon">👨‍🏫</div>
+                    <h3>Nenhum instrutor cadastrado</h3>
+                    <p>Clique no botão "Novo Instrutor" acima para começar a adicionar instrutores à plataforma.</p>
+                </div>
+            </div>
         </section>
 
         <!-- INSCRIÇÕES -->
@@ -104,11 +182,21 @@
             <h2>📝 Gerenciar Inscrições</h2>
             
             <div class="actions">
-                <button onclick="showModalInscricao()" class="btn-primary">➕ Nova Inscrição</button>
-                <button onclick="carregarInscricoes()" class="btn-secondary">🔄 Atualizar</button>
+                <button onclick="showModalInscricao()" class="btn-primary">
+                    <span>➕</span> Nova Inscrição
+                </button>
+                <button onclick="carregarInscricoes()" class="btn-outline">
+                    <span>🔄</span> Atualizar
+                </button>
             </div>
 
-            <div id="listaInscricoes" class="data-list"></div>
+            <div id="listaInscricoes" class="data-list">
+                <div class="empty-state">
+                    <div class="empty-state-icon">📝</div>
+                    <h3>Nenhuma inscrição realizada</h3>
+                    <p>Clique no botão "Nova Inscrição" acima para começar a inscrever alunos nos cursos.</p>
+                </div>
+            </div>
         </section>
 
         <!-- MODAL ALUNO -->

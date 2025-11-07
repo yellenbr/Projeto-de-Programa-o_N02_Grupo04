@@ -15,10 +15,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/alunos/{alunoId}")
 public class AlunoFluxoController {
-    
+
     @Autowired
     private InscricaoService inscricaoService;
-    
+
     @PostMapping("/inscrever/{cursoId}")
     public ResponseEntity<?> inscrever(@PathVariable Long alunoId, @PathVariable Long cursoId) {
         try {
@@ -28,13 +28,13 @@ public class AlunoFluxoController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-    
+
 
     @PostMapping("/pagamento/{inscricaoId}")
     public ResponseEntity<?> realizarPagamento(
-        @PathVariable Long alunoId,
-        @PathVariable Long inscricaoId,
-        @RequestParam Pagamento.MetodoPagamento metodoPagamento) {
+            @PathVariable Long alunoId,
+            @PathVariable Long inscricaoId,
+            @RequestParam Pagamento.MetodoPagamento metodoPagamento) {
         try {
             Inscricao inscricao = inscricaoService.processarPagamento(inscricaoId, metodoPagamento);
             return ResponseEntity.ok(inscricao);
@@ -42,12 +42,12 @@ public class AlunoFluxoController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-    
+
 
     @PostMapping("/cancelar/{inscricaoId}")
     public ResponseEntity<?> cancelarInscricao(
-        @PathVariable Long alunoId,
-        @PathVariable Long inscricaoId) {
+            @PathVariable Long alunoId,
+            @PathVariable Long inscricaoId) {
         try {
             ReembolsoDTO reembolso = inscricaoService.cancelarInscricao(inscricaoId);
             return ResponseEntity.ok(reembolso);
@@ -55,12 +55,12 @@ public class AlunoFluxoController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-    
+
     @PostMapping("/transferir/{inscricaoId}")
     public ResponseEntity<?> transferirCurso(
-        @PathVariable Long alunoId,
-        @PathVariable Long inscricaoId,
-        @RequestParam Long novoCursoId) {
+            @PathVariable Long alunoId,
+            @PathVariable Long inscricaoId,
+            @RequestParam Long novoCursoId) {
         try {
             TransferenciaDTO transferencia = inscricaoService.transferirCurso(inscricaoId, novoCursoId);
             return ResponseEntity.ok(transferencia);
@@ -68,7 +68,7 @@ public class AlunoFluxoController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-    
+
     @GetMapping("/inscricoes")
     public ResponseEntity<List<Inscricao>> listarInscricoes(@PathVariable Long alunoId) {
         List<Inscricao> inscricoes = inscricaoService.buscarPorAluno(alunoId);

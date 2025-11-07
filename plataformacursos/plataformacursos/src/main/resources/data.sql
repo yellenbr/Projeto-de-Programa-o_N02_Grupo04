@@ -6,11 +6,11 @@
 -- ========================================
 -- 1. INSTRUTORES
 -- ========================================
-INSERT INTO instrutores (id, nome, email, especialidade) VALUES
-(1, 'João Silva', 'joao.silva@veridia.com', 'Desenvolvimento Backend'),
-(2, 'Maria Santos', 'maria.santos@veridia.com', 'Data Science e IA'),
-(3, 'Pedro Oliveira', 'pedro.oliveira@veridia.com', 'DevOps e Cloud'),
-(4, 'Ana Rodrigues', 'ana.rodrigues@veridia.com', 'Frontend e UX');
+INSERT INTO instrutores (id, nome, email, cpf, especialidade) VALUES
+(1, 'João Silva', 'joao.silva@veridia.com', '11122233344', 'Desenvolvimento Backend'),
+(2, 'Maria Santos', 'maria.santos@veridia.com', '22233344455', 'Data Science e IA'),
+(3, 'Pedro Oliveira', 'pedro.oliveira@veridia.com', '33344455566', 'DevOps e Cloud'),
+(4, 'Ana Rodrigues', 'ana.rodrigues@veridia.com', '44455566677', 'Frontend e UX');
 
 -- ========================================
 -- 2. CURSOS (vinculados aos instrutores)
