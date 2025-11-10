@@ -11,11 +11,11 @@
         <header>
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
-                    <h1>🎓 Área do Aluno</h1>
+                    <h1>Área do Aluno</h1>
                     <p id="nomeAluno">Bem-vindo(a)!</p>
                 </div>
                 <button onclick="logout()" class="btn-outline" title="Sair do sistema">
-                    🚪 Sair
+                    Sair
                 </button>
             </div>
         </header>
@@ -37,7 +37,7 @@
 
         <!-- MEUS DADOS -->
         <section id="meusDados" class="content-section active">
-            <h2>👤 Meus Dados</h2>
+            <h2>Meus Dados</h2>
             
             <div class="stats-grid">
                 <div class="stat-card">
@@ -59,18 +59,23 @@
             </div>
 
             <div class="info-section" style="margin-top: 2rem;">
-                <h3>ℹ️ Informações Pessoais</h3>
+                <h3>Informações Pessoais</h3>
                 <div id="dadosAluno"></div>
+            </div>
+
+            <div class="info-section" style="margin-top: 2rem;">
+                <h3>Meus Cursos Inscritos</h3>
+                <div id="listaCursosInscritos" class="data-list"></div>
             </div>
         </section>
 
         <!-- CURSOS DISPONÍVEIS -->
         <section id="cursosDisponiveis" class="content-section">
-            <h2>📚 Cursos Disponíveis</h2>
+            <h2>Cursos Disponíveis</h2>
             
             <div class="actions">
                 <button onclick="carregarCursosDisponiveis()" class="btn-outline">
-                    <span>🔄</span> Atualizar
+                    <span></span> Atualizar
                 </button>
             </div>
 
@@ -79,11 +84,11 @@
 
         <!-- MINHAS INSCRIÇÕES -->
         <section id="minhasInscricoes" class="content-section">
-            <h2>📝 Minhas Inscrições</h2>
+            <h2>Minhas Inscrições</h2>
             
             <div class="actions">
                 <button onclick="carregarMinhasInscricoes()" class="btn-outline">
-                    <span>🔄</span> Atualizar
+                    <span></span> Atualizar
                 </button>
             </div>
 
@@ -92,11 +97,11 @@
 
         <!-- MEUS PAGAMENTOS -->
         <section id="meusPagamentos" class="content-section">
-            <h2>💰 Histórico de Pagamentos</h2>
+            <h2>Histórico de Pagamentos</h2>
             
             <div class="actions">
                 <button onclick="carregarMeusPagamentos()" class="btn-outline">
-                    <span>🔄</span> Atualizar
+                    <span></span> Atualizar
                 </button>
             </div>
 
@@ -106,11 +111,10 @@
 
     <script src="js/app.js"></script>
     <script>
-        const API_URL = 'http://localhost:8080/api';
         let session = null;
         let alunoLogado = null;
 
-        // Verificar autenticação
+        
         window.addEventListener('load', async () => {
             const sessionData = localStorage.getItem('session');
             if (!sessionData) {
@@ -143,7 +147,7 @@
             document.getElementById(sectionId).classList.add('active');
             event.target.classList.add('active');
 
-            // Carregar dados da seção
+            
             if (sectionId === 'minhasInscricoes') carregarMinhasInscricoes();
             if (sectionId === 'meusPagamentos') carregarMeusPagamentos();
             if (sectionId === 'cursosDisponiveis') carregarCursosDisponiveis();
@@ -155,7 +159,7 @@
                 const response = await fetch(`${API_URL}/teste/aluno/${alunoLogado.id}/detalhes`);
                 const data = await response.json();
 
-                // Atualizar estatísticas
+                
                 document.getElementById('totalInscricoesAluno').textContent = data.inscricoes?.length || 0;
                 document.getElementById('cursosAtivosAluno').textContent = data.numeroCursosAtivos || 0;
                 
@@ -165,7 +169,7 @@
                 document.getElementById('cursosPendentesAluno').textContent = pendentes;
                 document.getElementById('cursosConcluidosAluno').textContent = concluidos;
 
-                // Mostrar dados pessoais
+                
                 const dadosDiv = document.getElementById('dadosAluno');
                 dadosDiv.innerHTML = `
                     <p><strong>Nome:</strong> ${data.aluno.nome}</p>
@@ -179,6 +183,49 @@
                     </p>
                 `;
 
+                const listaCursosInscritos = document.getElementById('listaCursosInscritos');
+                if (data.inscricoes && data.inscricoes.length > 0) {
+                    listaCursosInscritos.innerHTML = '';
+                    
+                    const inscricoesValidas = data.inscricoes.filter(i => i && typeof i === 'object' && i.id);
+                    
+                    if (inscricoesValidas.length === 0) {
+                        listaCursosInscritos.innerHTML = '<div class="empty-state"><div class="empty-state-icon"></div><h3>Você ainda não possui inscrições</h3><p>Explore os cursos disponíveis e inscreva-se!</p></div>';
+                        return;
+                    }
+                    
+                    const detalhesPromises = inscricoesValidas.map(inscricao => 
+                        fetch(`${API_URL}/teste/inscricao/${inscricao.id}/detalhes`).then(r => r.json())
+                    );
+                    const todosDetalhes = await Promise.all(detalhesPromises);
+
+                    todosDetalhes.forEach(detalhes => {
+                        if (!detalhes || !detalhes.inscricao) return;
+                        
+                        const inscricao = detalhes.inscricao;
+                        const curso = detalhes.curso;
+                        
+                        const statusClass = 
+                            inscricao.status === 'PAGO' || inscricao.status === 'CONFIRMADA' || inscricao.status === 'CONCLUIDA' ? 'badge-success' :
+                            inscricao.status === 'PENDENTE' ? 'badge-warning' :
+                            'badge-danger';
+
+                        const div = document.createElement('div');
+                        div.className = 'data-item';
+                        div.innerHTML = `
+                            <h4>${curso?.nome || 'Curso não informado'}</h4>
+                            <p><strong>Instrutor:</strong> ${curso?.instrutor?.nome || 'Não informado'}</p>
+                            <p><strong>Data de Inscrição:</strong> ${new Date(inscricao.dataInscricao).toLocaleString('pt-BR')}</p>
+                            <p><strong>Status:</strong> 
+                                <span class="badge ${statusClass}">${inscricao.status}</span>
+                            </p>
+                        `;
+                        listaCursosInscritos.appendChild(div);
+                    });
+                } else {
+                    listaCursosInscritos.innerHTML = '<div class="empty-state"><div class="empty-state-icon"></div><h3>Você ainda não possui inscrições</h3><p>Explore os cursos disponíveis e inscreva-se!</p></div>';
+                }
+
             } catch (error) {
                 console.error('Erro ao carregar dados:', error);
                 showAlert('Erro ao carregar dados do aluno', 'error');
@@ -190,43 +237,57 @@
                 const response = await fetch(`${API_URL}/cursos`);
                 const cursos = await response.json();
 
+                const inscricoesResponse = await fetch(`${API_URL}/teste/inscricoes`);
+                const todasInscricoes = await inscricoesResponse.json();
+                const cursosInscritos = todasInscricoes
+                    .filter(i => {
+                        const alunoId = typeof i.aluno === 'object' ? i.aluno.id : i.aluno;
+                        return alunoId === alunoLogado.id && i.status !== 'CANCELADA';
+                    })
+                    .map(i => typeof i.curso === 'object' ? i.curso.id : i.curso);
+
                 const lista = document.getElementById('listaCursosDisponiveis');
                 lista.innerHTML = '';
 
                 if (cursos.length === 0) {
-                    lista.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📚</div><h3>Nenhum curso disponível</h3></div>';
+                    lista.innerHTML = '<div class="empty-state"><div class="empty-state-icon"></div><h3>Nenhum curso disponível</h3></div>';
                     return;
                 }
 
                 const cursosAtivos = cursos.filter(c => c.ativo);
 
-                for (const curso of cursosAtivos) {
-                    // Buscar detalhes do curso
-                    const detalhesResp = await fetch(`${API_URL}/teste/curso/${curso.id}/detalhes`);
-                    const detalhes = await detalhesResp.json();
+                const detalhesPromises = cursosAtivos.map(curso => 
+                    fetch(`${API_URL}/teste/curso/${curso.id}/detalhes`).then(r => r.json())
+                );
+                const todosDetalhes = await Promise.all(detalhesPromises);
+
+                cursosAtivos.forEach((curso, index) => {
+                    const detalhes = todosDetalhes[index];
+                    const jaInscrito = cursosInscritos.includes(curso.id);
 
                     const div = document.createElement('div');
                     div.className = 'data-item';
                     div.innerHTML = `
-                        <h4>📚 ${curso.nome}</h4>
+                        <h4>${curso.nome}</h4>
                         <p>${curso.descricao || 'Sem descrição'}</p>
                         <p><strong>Instrutor:</strong> ${detalhes.instrutor?.nome || 'Não informado'}</p>
                         <p><strong>Preço:</strong> R$ ${curso.preco.toFixed(2)}</p>
                         <p><strong>Carga Horária:</strong> ${curso.cargaHoraria}h</p>
-                        <p><strong>Vagas:</strong> ${detalhes.numeroInscritos || 0}/${curso.vagas}</p>
+                        <p><strong>Vagas:</strong> ${detalhes.numeroInscritos || 0}/${curso.limiteVagas || 'Ilimitado'}</p>
                         <p><strong>Status:</strong> 
                             <span class="badge ${detalhes.vagasDisponiveis ? 'badge-success' : 'badge-danger'}">
                                 ${detalhes.vagasDisponiveis ? '✓ Vagas Disponíveis' : '✗ Esgotado'}
                             </span>
                         </p>
+                        ${jaInscrito ? '<p><strong><span class="badge badge-warning">✓ Você já está inscrito neste curso</span></strong></p>' : ''}
                         <div class="item-actions">
-                            <button onclick="inscreverNoCurso(${curso.id})" class="btn-primary" ${!detalhes.vagasDisponiveis ? 'disabled' : ''}>
-                                ➕ Inscrever-se
+                            <button onclick="inscreverNoCurso(${curso.id})" class="btn-primary" ${!detalhes.vagasDisponiveis || jaInscrito ? 'disabled' : ''}>
+                                ${jaInscrito ? '✓ Já Inscrito' : '➕ Inscrever-se'}
                             </button>
                         </div>
                     `;
                     lista.appendChild(div);
-                }
+                });
 
             } catch (error) {
                 console.error('Erro ao carregar cursos:', error);
@@ -236,43 +297,69 @@
 
         async function carregarMinhasInscricoes() {
             try {
-                const response = await fetch(`${API_URL}/inscricoes`);
+                const response = await fetch(`${API_URL}/teste/inscricoes`);
                 const todasInscricoes = await response.json();
                 
-                const minhasInscricoes = todasInscricoes.filter(i => i.aluno.id === alunoLogado.id);
+                console.log('Todas as inscrições:', todasInscricoes);
+                console.log('ID do aluno logado:', alunoLogado.id);
+                
+                const minhasInscricoes = todasInscricoes.filter(i => {
+                    if (!i || typeof i !== 'object' || !i.id) return false;
+                    const alunoId = typeof i.aluno === 'object' ? i.aluno.id : i.aluno;
+                    console.log('Comparando:', alunoId, '===', alunoLogado.id);
+                    return alunoId === alunoLogado.id;
+                });
+
+                console.log('Minhas inscrições filtradas:', minhasInscricoes);
 
                 const lista = document.getElementById('listaMinhasInscricoes');
                 lista.innerHTML = '';
 
                 if (minhasInscricoes.length === 0) {
-                    lista.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📝</div><h3>Você ainda não possui inscrições</h3><p>Explore os cursos disponíveis e inscreva-se!</p></div>';
+                    lista.innerHTML = '<div class="empty-state"><div class="empty-state-icon"></div><h3>Você ainda não possui inscrições</h3><p>Explore os cursos disponíveis e inscreva-se!</p></div>';
                     return;
                 }
 
+                console.log('Buscando detalhes de', minhasInscricoes.length, 'inscrições...');
+                
                 for (const inscricao of minhasInscricoes) {
-                    const statusClass = 
-                        inscricao.status === 'PAGO' || inscricao.status === 'CONFIRMADA' || inscricao.status === 'CONCLUIDA' ? 'badge-success' :
-                        inscricao.status === 'PENDENTE' ? 'badge-warning' :
-                        'badge-danger';
+                    try {
+                        const cursoId = typeof inscricao.curso === 'object' ? inscricao.curso.id : inscricao.curso;
+                        console.log('Buscando curso ID:', cursoId, 'para inscrição:', inscricao);
+                        
+                        const cursoResp = await fetch(`${API_URL}/cursos/${cursoId}`);
+                        const curso = await cursoResp.json();
+                        
+                        console.log('Curso carregado:', curso);
+                        
+                        const statusClass = 
+                            inscricao.status === 'PAGO' || inscricao.status === 'CONFIRMADA' || inscricao.status === 'CONCLUIDA' ? 'badge-success' :
+                            inscricao.status === 'PENDENTE' ? 'badge-warning' :
+                            'badge-danger';
 
-                    const div = document.createElement('div');
-                    div.className = 'data-item';
-                    div.innerHTML = `
-                        <h4>${inscricao.curso.nome}</h4>
-                        <p><strong>Data de Inscrição:</strong> ${new Date(inscricao.dataInscricao).toLocaleString('pt-BR')}</p>
-                        <p><strong>Valor:</strong> R$ ${inscricao.curso.preco.toFixed(2)}</p>
-                        <p><strong>Status:</strong> 
-                            <span class="badge ${statusClass}">${inscricao.status}</span>
-                        </p>
-                        <div class="item-actions">
-                            ${inscricao.status === 'PENDENTE' ? 
-                                `<button onclick="processarPagamento(${inscricao.id})" class="btn-primary">💰 Pagar Agora</button>` : ''}
-                            ${inscricao.status !== 'CANCELADA' && inscricao.status !== 'CONCLUIDA' ? 
-                                `<button onclick="cancelarInscricao(${inscricao.id})" class="btn-danger">❌ Cancelar</button>` : ''}
-                            <button onclick="verDetalhesInscricao(${inscricao.id})" class="btn-outline">📋 Detalhes</button>
-                        </div>
-                    `;
-                    lista.appendChild(div);
+                        const div = document.createElement('div');
+                        div.className = 'data-item';
+                        div.innerHTML = `
+                            <h4>${curso?.nome || 'Curso não informado'}</h4>
+                            <p><strong>Instrutor:</strong> ${curso?.instrutor?.nome || 'Não informado'}</p>
+                            <p><strong>Data de Inscrição:</strong> ${new Date(inscricao.dataInscricao).toLocaleString('pt-BR')}</p>
+                            <p><strong>Valor:</strong> R$ ${curso?.preco?.toFixed(2) || '0.00'}</p>
+                            <p><strong>Status:</strong> 
+                                <span class="badge ${statusClass}">${inscricao.status}</span>
+                            </p>
+                            <div class="item-actions">
+                                ${inscricao.status === 'PENDENTE' ? 
+                                    `<button onclick="processarPagamento(${inscricao.id})" class="btn-primary">Pagar Agora</button>` : ''}
+                                ${inscricao.status !== 'CANCELADA' && inscricao.status !== 'CONCLUIDA' ? 
+                                    `<button onclick="cancelarInscricao(${inscricao.id})" class="btn-danger">Cancelar</button>` : ''}
+                                <button onclick="verDetalhesInscricao(${inscricao.id})" class="btn-outline">Detalhes</button>
+                            </div>
+                        `;
+                        lista.appendChild(div);
+                        console.log('Curso adicionado à lista!');
+                    } catch (error) {
+                        console.error('Erro ao carregar detalhes do curso:', error);
+                    }
                 }
 
             } catch (error) {
@@ -283,40 +370,47 @@
 
         async function carregarMeusPagamentos() {
             try {
-                const response = await fetch(`${API_URL}/inscricoes`);
+                const response = await fetch(`${API_URL}/teste/inscricoes`);
                 const todasInscricoes = await response.json();
                 
-                const minhasInscricoes = todasInscricoes.filter(i => i.aluno.id === alunoLogado.id && i.pagamento);
+                const minhasInscricoes = todasInscricoes.filter(i => {
+                    if (!i || typeof i !== 'object' || !i.id) return false;
+                    const alunoId = typeof i.aluno === 'object' ? i.aluno.id : i.aluno;
+                    return alunoId === alunoLogado.id && i.pagamento;
+                });
 
                 const lista = document.getElementById('listaMeusPagamentos');
                 lista.innerHTML = '';
 
                 if (minhasInscricoes.length === 0) {
-                    lista.innerHTML = '<div class="empty-state"><div class="empty-state-icon">💰</div><h3>Nenhum pagamento realizado</h3></div>';
+                    lista.innerHTML = '<div class="empty-state"><div class="empty-state-icon"></div><h3>Nenhum pagamento realizado</h3></div>';
                     return;
                 }
 
-                for (const inscricao of minhasInscricoes) {
-                    const detalhesResp = await fetch(`${API_URL}/teste/inscricao/${inscricao.id}/detalhes`);
-                    const detalhes = await detalhesResp.json();
+                const detalhesPromises = minhasInscricoes.map(inscricao => 
+                    fetch(`${API_URL}/teste/inscricao/${inscricao.id}/detalhes`).then(r => r.json())
+                );
+                const todosDetalhes = await Promise.all(detalhesPromises);
 
-                    if (detalhes.pagamento) {
-                        const div = document.createElement('div');
-                        div.className = 'data-item';
-                        div.innerHTML = `
-                            <h4>Pagamento - ${inscricao.curso.nome}</h4>
-                            <p><strong>Valor:</strong> R$ ${detalhes.pagamento.valor.toFixed(2)}</p>
-                            <p><strong>Método:</strong> ${detalhes.pagamento.metodoPagamento}</p>
-                            <p><strong>Status:</strong> 
-                                <span class="badge ${detalhes.pagamento.status === 'PAGO' ? 'badge-success' : 'badge-warning'}">
-                                    ${detalhes.pagamento.status}
-                                </span>
-                            </p>
-                            <p><strong>Data:</strong> ${new Date(inscricao.dataInscricao).toLocaleString('pt-BR')}</p>
-                        `;
-                        lista.appendChild(div);
-                    }
-                }
+                todosDetalhes.forEach(detalhes => {
+                    if (!detalhes || !detalhes.pagamento) return;
+                    
+                    const curso = detalhes.curso;
+                    const div = document.createElement('div');
+                    div.className = 'data-item';
+                    div.innerHTML = `
+                        <h4>Pagamento - ${curso?.nome || 'Curso não informado'}</h4>
+                        <p><strong>Valor:</strong> R$ ${detalhes.pagamento.valor?.toFixed(2) || '0.00'}</p>
+                        <p><strong>Método:</strong> ${detalhes.pagamento.metodoPagamento}</p>
+                        <p><strong>Status:</strong> 
+                            <span class="badge ${detalhes.pagamento.status === 'CONFIRMADO' ? 'badge-success' : 'badge-warning'}">
+                                ${detalhes.pagamento.status}
+                            </span>
+                        </p>
+                        <p><strong>Data:</strong> ${new Date(detalhes.pagamento.dataPagamento || detalhes.inscricao.dataInscricao).toLocaleString('pt-BR')}</p>
+                    `;
+                    lista.appendChild(div);
+                });
 
             } catch (error) {
                 console.error('Erro ao carregar pagamentos:', error);
@@ -325,25 +419,47 @@
         }
 
         async function inscreverNoCurso(cursoId) {
-            if (!confirm('Deseja se inscrever neste curso?')) return;
+            const metodo = prompt('Escolha o método de pagamento:\n1 - PIX (Chave: pagamento@teste.com)\n2 - Cartão de Crédito (Número: 4111 1111 1111 1111)\n3 - Boleto (Código de barras será gerado)');
+            const metodos = { '1': 'PIX', '2': 'CARTAO_CREDITO', '3': 'BOLETO' };
+            
+            if (!metodos[metodo]) {
+                showAlert('Método de pagamento inválido', 'error');
+                return;
+            }
+
+            if (!confirm('Confirma a inscrição e pagamento neste curso?')) return;
 
             try {
-                const response = await fetch(
-                    `${API_URL}/alunos/${alunoLogado.id}/inscrever?cursoId=${cursoId}`,
+                const inscricaoResponse = await fetch(
+                    `${API_URL}/alunos/${alunoLogado.id}/inscrever/${cursoId}`,
                     { method: 'POST' }
                 );
 
-                if (response.ok) {
-                    showAlert('Inscrição realizada com sucesso!', 'success');
+                if (!inscricaoResponse.ok) {
+                    const error = await inscricaoResponse.json();
+                    showAlert(error.mensagem || 'Erro ao realizar inscrição', 'error');
+                    return;
+                }
+
+                const inscricao = await inscricaoResponse.json();
+                
+                const pagamentoResponse = await fetch(
+                    `${API_URL}/alunos/${alunoLogado.id}/pagamento/${inscricao.id}?metodoPagamento=${metodos[metodo]}`,
+                    { method: 'POST' }
+                );
+
+                if (pagamentoResponse.ok) {
+                    showAlert('Inscrição e pagamento realizados com sucesso!', 'success');
                     carregarDadosAluno();
                     carregarCursosDisponiveis();
+                    carregarMinhasInscricoes();
                 } else {
-                    const error = await response.json();
-                    showAlert(error.mensagem || 'Erro ao realizar inscrição', 'error');
+                    const error = await pagamentoResponse.json();
+                    showAlert('Inscrição feita, mas houve erro no pagamento: ' + (error.mensagem || 'Erro desconhecido'), 'error');
                 }
             } catch (error) {
                 console.error('Erro:', error);
-                showAlert('Erro ao realizar inscrição', 'error');
+                showAlert('Erro ao realizar inscrição e pagamento', 'error');
             }
         }
 

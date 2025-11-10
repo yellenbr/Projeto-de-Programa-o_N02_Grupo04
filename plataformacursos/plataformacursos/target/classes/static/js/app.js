@@ -100,16 +100,18 @@ function closeModal(modalId) {
 // Funções de Dashboard
 async function carregarDashboard() {
     try {
+        const totalAlunosEl = document.getElementById('totalAlunos');
+        if (!totalAlunosEl) return;
+        
         const response = await fetch(`${API_URL}/teste/status`);
         const data = await response.json();
         
-        document.getElementById('totalAlunos').textContent = data.alunos || 0;
+        totalAlunosEl.textContent = data.alunos || 0;
         document.getElementById('totalCursos').textContent = data.cursos || 0;
         document.getElementById('totalInstrutores').textContent = data.instrutores || 0;
         document.getElementById('totalInscricoes').textContent = data.inscricoes || 0;
     } catch (error) {
         console.error('Erro ao carregar dashboard:', error);
-        showAlert('Erro ao carregar estatísticas', 'error');
     }
 }
 
@@ -131,13 +133,13 @@ async function carregarAlunos() {
             const div = document.createElement('div');
             div.className = 'data-item';
             div.innerHTML = `
-                <h4>👤 ${aluno.nome}</h4>
+                <h4>${aluno.nome}</h4>
                 <p><strong>Email:</strong> ${aluno.email}</p>
                 <p><strong>CPF:</strong> ${formatarCPF(aluno.cpf)}</p>
                 <p><strong>ID:</strong> ${aluno.id}</p>
                 <div class="item-actions">
-                    <button onclick="verDetalhesAluno(${aluno.id})" class="btn-primary">📋 Detalhes</button>
-                    <button onclick="deletarAluno(${aluno.id})" class="btn-danger">🗑️ Excluir</button>
+                    <button onclick="verDetalhesAluno(${aluno.id})" class="btn-primary">Detalhes</button>
+                    <button onclick="deletarAluno(${aluno.id})" class="btn-danger">Excluir</button>
                 </div>
             `;
             listaAlunos.appendChild(div);
@@ -205,7 +207,7 @@ async function verDetalhesAluno(id) {
         const data = await response.json();
         
         let html = `
-            <h3>📋 Detalhes do Aluno</h3>
+            <h3>Detalhes do Aluno</h3>
             <p><strong>Nome:</strong> ${data.aluno.nome}</p>
             <p><strong>Email:</strong> ${data.aluno.email}</p>
             <p><strong>CPF:</strong> ${formatarCPF(data.aluno.cpf)}</p>
@@ -247,19 +249,19 @@ async function carregarCursos() {
             const div = document.createElement('div');
             div.className = 'data-item';
             div.innerHTML = `
-                <h4>📚 ${curso.nome}</h4>
+                <h4>${curso.nome}</h4>
                 <p>${curso.descricao || 'Sem descrição'}</p>
                 <p><strong>Preço:</strong> R$ ${curso.preco.toFixed(2)}</p>
                 <p><strong>Carga Horária:</strong> ${curso.cargaHoraria}h</p>
                 <p><strong>Vagas:</strong> ${curso.vagas}</p>
                 <p><strong>Status:</strong> 
                     <span class="badge ${curso.ativo ? 'badge-success' : 'badge-danger'}">
-                        ${curso.ativo ? '✓ Ativo' : '✗ Inativo'}
+                        ${curso.ativo ? 'Ativo' : 'Inativo'}
                     </span>
                 </p>
                 <div class="item-actions">
-                    <button onclick="verDetalhesCurso(${curso.id})" class="btn-primary">📋 Detalhes</button>
-                    <button onclick="deletarCurso(${curso.id})" class="btn-danger">🗑️ Excluir</button>
+                    <button onclick="verDetalhesCurso(${curso.id})" class="btn-primary">Detalhes</button>
+                    <button onclick="deletarCurso(${curso.id})" class="btn-danger">Excluir</button>
                 </div>
             `;
             listaCursos.appendChild(div);
@@ -329,7 +331,7 @@ async function verDetalhesCurso(id) {
         const data = await response.json();
         
         let html = `
-            <h3>📋 Detalhes do Curso</h3>
+            <h3>Detalhes do Curso</h3>
             <p><strong>Nome:</strong> ${data.curso.nome}</p>
             <p><strong>Descrição:</strong> ${data.curso.descricao || 'N/A'}</p>
             <p><strong>Preço:</strong> R$ ${data.curso.preco.toFixed(2)}</p>
@@ -364,12 +366,12 @@ async function carregarInstrutores() {
             const div = document.createElement('div');
             div.className = 'data-item';
             div.innerHTML = `
-                <h4>👨‍🏫 ${instrutor.nome}</h4>
+                <h4>${instrutor.nome}</h4>
                 <p><strong>Email:</strong> ${instrutor.email}</p>
                 <p><strong>Especialidade:</strong> ${instrutor.especialidade || 'Não informada'}</p>
                 <p><strong>ID:</strong> ${instrutor.id}</p>
                 <div class="item-actions">
-                    <button onclick="deletarInstrutor(${instrutor.id})" class="btn-danger">🗑️ Excluir</button>
+                    <button onclick="deletarInstrutor(${instrutor.id})" class="btn-danger">Excluir</button>
                 </div>
             `;
             listaInstrutores.appendChild(div);
@@ -454,7 +456,7 @@ async function carregarInscricoes() {
             const div = document.createElement('div');
             div.className = 'data-item';
             div.innerHTML = `
-                <h4>📝 Inscrição #${inscricao.id}</h4>
+                <h4>Inscrição #${inscricao.id}</h4>
                 <p><strong>Aluno:</strong> ${inscricao.aluno.nome}</p>
                 <p><strong>Curso:</strong> ${inscricao.curso.nome}</p>
                 <p><strong>Data:</strong> ${new Date(inscricao.dataInscricao).toLocaleString('pt-BR')}</p>
@@ -462,11 +464,11 @@ async function carregarInscricoes() {
                     <span class="badge ${statusClass}">${inscricao.status}</span>
                 </p>
                 <div class="item-actions">
-                    <button onclick="verDetalhesInscricao(${inscricao.id})" class="btn-primary">📋 Detalhes</button>
+                    <button onclick="verDetalhesInscricao(${inscricao.id})" class="btn-primary">Detalhes</button>
                     ${inscricao.status === 'PENDENTE' ? 
-                        `<button onclick="processarPagamento(${inscricao.id})" class="btn-secondary">💰 Pagar</button>` : ''}
+                        `<button onclick="processarPagamento(${inscricao.id})" class="btn-secondary">Pagar</button>` : ''}
                     ${inscricao.status !== 'CANCELADA' ? 
-                        `<button onclick="cancelarInscricao(${inscricao.id})" class="btn-danger">❌ Cancelar</button>` : ''}
+                        `<button onclick="cancelarInscricao(${inscricao.id})" class="btn-danger">Cancelar</button>` : ''}
                 </div>
             `;
             listaInscricoes.appendChild(div);
@@ -573,7 +575,7 @@ async function verDetalhesInscricao(id) {
         const data = await response.json();
         
         let html = `
-            <h3>📋 Detalhes da Inscrição</h3>
+            <h3>Detalhes da Inscrição</h3>
             <p><strong>ID:</strong> ${data.inscricao.id}</p>
             <p><strong>Aluno:</strong> ${data.aluno.nome}</p>
             <p><strong>Curso:</strong> ${data.curso.nome}</p>
@@ -586,7 +588,7 @@ async function verDetalhesInscricao(id) {
         
         if (data.pagamento) {
             html += `
-                <h4>💰 Pagamento</h4>
+                <h4>Pagamento</h4>
                 <p><strong>Valor:</strong> R$ ${data.pagamento.valor.toFixed(2)}</p>
                 <p><strong>Método:</strong> ${data.pagamento.metodoPagamento}</p>
                 <p><strong>Status:</strong> ${data.pagamento.status}</p>

@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/alunos/{alunoId}")
@@ -25,7 +26,7 @@ public class AlunoFluxoController {
             Inscricao inscricao = inscricaoService.inscrever(alunoId, cursoId);
             return ResponseEntity.status(HttpStatus.CREATED).body(inscricao);
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("mensagem", e.getMessage()));
         }
     }
 
@@ -39,7 +40,7 @@ public class AlunoFluxoController {
             Inscricao inscricao = inscricaoService.processarPagamento(inscricaoId, metodoPagamento);
             return ResponseEntity.ok(inscricao);
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("mensagem", e.getMessage()));
         }
     }
 
@@ -52,7 +53,7 @@ public class AlunoFluxoController {
             ReembolsoDTO reembolso = inscricaoService.cancelarInscricao(inscricaoId);
             return ResponseEntity.ok(reembolso);
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("mensagem", e.getMessage()));
         }
     }
 
@@ -65,7 +66,7 @@ public class AlunoFluxoController {
             TransferenciaDTO transferencia = inscricaoService.transferirCurso(inscricaoId, novoCursoId);
             return ResponseEntity.ok(transferencia);
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("mensagem", e.getMessage()));
         }
     }
 

@@ -1,142 +1,203 @@
-# 🔐 CREDENCIAIS DE ACESSO - VERIDIA
+# CREDENCIAIS DE ACESSO - VERIDIA
 
-## 🌐 URLs de Acesso
+## URLs de Acesso
 - **Login:** http://localhost:8080/login.html
 - **Área do Aluno:** http://localhost:8080/aluno.html
 - **Área do Instrutor:** http://localhost:8080/instrutor.html
 - **Painel Admin:** http://localhost:8080/index.html
+- **Console H2 (Banco de Dados):** http://localhost:8080/h2-console
 
 ---
 
-## 👤 ADMINISTRADOR
+## 🗄️ ACESSO AO BANCO DE DADOS H2
 
-| Usuário | Senha | Descrição |
-|---------|-------|-----------|
-| `admin` | `admin123` | Acesso total ao sistema |
+### Console Web H2
+- **URL de Acesso**: http://localhost:8080/h2-console
+- **Driver Class**: `org.h2.Driver`
+- **JDBC URL**: `jdbc:h2:file:./data/plataformacursos`
+- **User Name**: `sa`
+- **Password**: *(deixe em branco)*
+
+### Localização do Arquivo do Banco
+```
+C:\Users\rayel\Documents\GitHub\Projeto-de-Programa-o_N02_Grupo04\plataformacursos\plataformacursos\data\plataformacursos.mv.db
+```
+
+### Como Acessar:
+1. Certifique-se de que o servidor está rodando
+2. Abra o navegador em: http://localhost:8080/h2-console
+3. Preencha os dados acima
+4. Clique em **"Connect"**
+
+### Tabelas Disponíveis:
+- `ALUNO` - Dados dos alunos
+- `INSTRUTOR` - Dados dos instrutores
+- `CURSOS` - Catálogo de cursos
+- `INSCRICOES` - Matrículas dos alunos
+- `PAGAMENTOS` - Histórico de pagamentos
+
+### Exemplos de Consultas SQL:
+```sql
+-- Ver todos os alunos
+SELECT * FROM ALUNO;
+
+-- Ver todos os cursos ativos
+SELECT * FROM CURSOS WHERE ATIVO = TRUE;
+
+-- Ver inscrições com pagamentos
+SELECT i.*, p.* FROM INSCRICOES i 
+LEFT JOIN PAGAMENTOS p ON i.ID = p.INSCRICAO_ID;
+
+-- Receita total por instrutor
+SELECT c.INSTRUTOR_ID, i.NOME, SUM(p.VALOR) AS RECEITA_TOTAL
+FROM PAGAMENTOS p
+JOIN INSCRICOES ins ON p.INSCRICAO_ID = ins.ID
+JOIN CURSOS c ON ins.CURSO_ID = c.ID
+JOIN INSTRUTOR i ON c.INSTRUTOR_ID = i.ID
+WHERE p.STATUS = 'CONFIRMADO'
+GROUP BY c.INSTRUTOR_ID, i.NOME;
+```
+
+---
+
+## ADMINISTRADOR
+
+| Email | Senha | Descrição |
+|-------|-------|-----------|
+| `admin@veridia.com` | `admin123` | Acesso total ao sistema |
 
 **Acesso direto:** http://localhost:8080/index.html
 
 ---
 
-## 👨‍🏫 INSTRUTORES
+## INSTRUTOR DE TESTE
 
-| Nome | Email | Senha (CPF) | Especialidade |
-|------|-------|-------------|---------------|
-| João Silva | `joao.silva@veridia.com` | `11122233344` | Desenvolvimento Backend |
-| Maria Santos | `maria.santos@veridia.com` | `22233344455` | Data Science e IA |
-| Pedro Oliveira | `pedro.oliveira@veridia.com` | `33344455566` | DevOps e Cloud |
-| Ana Rodrigues | `ana.rodrigues@veridia.com` | `44455566677` | Frontend e UX |
+| Nome | Email | Senha | Especialidade |
+|------|-------|-------|---------------|
+| Instrutor de Teste | `instrutor@teste.com` | `senha123` | Tecnologia |
 
-### Instrutor de Teste
-- **Email:** `instrutor@teste.com`
-- **Senha:** `22222222222`
-- **Observação:** Criado automaticamente pelo sistema
+**IMPORTANTE:** A senha pode conter letras e números (até 8 caracteres).
 
 ---
 
-## 👨‍🎓 ALUNOS
+## ALUNO DE TESTE
 
-| Nome | Email | CPF (Senha) | Situação |
-|------|-------|-------------|----------|
-| Carlos Mendes | `carlos.mendes@email.com` | `12345678900` | 2 cursos pagos (Java Spring Boot, Docker) |
-| Ana Paula Costa | `ana.paula@email.com` | `98765432100` | 1 inscrição pendente (Python Data Science) |
-| Roberto Silva | `roberto.silva@email.com` | `45678912300` | 1 pago (Java), 1 pendente (React) |
-| Juliana Ferreira | `juliana.ferreira@email.com` | `78912345600` | 2 cursos pagos (Python, DevOps AWS) |
-| Marcos Antonio | `marcos.antonio@email.com` | `32165498700` | 3 cursos (1 pago, 1 confirmado, 1 pendente) |
+| Nome | Email | CPF (Senha) |
+|------|-------|-------------|
+| Aluno de Teste | `aluno@teste.com` | `11111111111` |
 
-### Aluno de Teste
-- **Email:** `aluno@teste.com`
-- **CPF:** `11111111111`
-- **Observação:** Criado automaticamente pelo sistema
+**IMPORTANTE:** O CPF pode ser digitado **COM** ou **SEM** formatação. O sistema aceita ambos os formatos:
+- Com formatação: `111.111.111-11`
+- Sem formatação: `11111111111`
 
 ---
 
-## 🚀 COMO USAR
+## COMO USAR
 
 ### Login Manual
 1. Acesse http://localhost:8080/login.html
 2. Escolha a aba: **Aluno**, **Instrutor** ou **Admin**
-3. Digite as credenciais da tabela acima
+3. Digite as credenciais abaixo
 4. Clique em "Entrar"
 
 ### Formato de Login
 
 **Para ALUNO:**
-- Campo 1: Email
-- Campo 2: CPF (11 dígitos, pode usar com ou sem formatação)
+- Email: `aluno@teste.com`
+- CPF: `11111111111` (pode digitar `111.111.111-11` ou `11111111111`)
 
 **Para INSTRUTOR:**
-- Campo 1: Email
-- Campo 2: Senha (que é o CPF de 11 dígitos)
+- Email: `instrutor@teste.com`
+- Senha: `senha123` (até 8 caracteres, letras e números)
 
 **Para ADMIN:**
-- Campo 1: Usuário
-- Campo 2: Senha
+- Usuário: `admin@veridia.com`
+- Senha: `admin123` (até 8 caracteres)
 
 ---
 
-## 🎯 CENÁRIOS DE TESTE RECOMENDADOS
+## 💳 CREDENCIAIS DE PAGAMENTO (TESTE)
 
-### 1. Testar como Aluno
-**Use:** `carlos.mendes@email.com` / `12345678900`
-- ✅ Já tem cursos pagos
-- ✅ Pode se inscrever em mais cursos
-- ✅ Ver histórico de pagamentos
+### 1. PIX 💰
+- **Chave PIX**: `pagamento@teste.com`
+- **Nome do Beneficiário**: Plataforma Veridia
+- **Tipo de Chave**: E-mail
 
-### 2. Testar como Instrutor
-**Use:** `joao.silva@veridia.com` / `11122233344`
-- ✅ Já tem 2 cursos criados (Java Spring Boot, Node.js)
-- ✅ Tem alunos inscritos
-- ✅ Ver receita gerada
+### 2. Cartão de Crédito 💳
+- **Número do Cartão**: `4111 1111 1111 1111`
+- **Titular**: TESTE USUARIO
+- **Validade**: `12/2030`
+- **CVV**: `123`
+- **Bandeira**: Visa
 
-### 3. Testar como Admin
-**Use:** `admin` / `admin123`
-- ✅ Acesso total ao dashboard
-- ✅ Gerenciar tudo no sistema
+**Cartões alternativos:**
+- Mastercard: `5555 5555 5555 4444`
+- Amex: `3782 822463 10005`
 
----
+### 3. Boleto Bancário 🧾
+- **Código de Barras**: Gerado automaticamente
+- **Vencimento**: 3 dias úteis
+- **Banco**: Banco de Testes - 001
 
-## 📊 DADOS PRÉ-CADASTRADOS
+### Como usar:
+Ao clicar em **"Inscrever-se"** em um curso, escolha:
+- Digite `1` para PIX
+- Digite `2` para Cartão de Crédito
+- Digite `3` para Boleto
 
-### Cursos Disponíveis
-1. **Java Spring Boot Completo** - R$ 299,90 (João Silva)
-2. **Python para Data Science** - R$ 399,90 (Maria Santos)
-3. **Docker e Kubernetes** - R$ 349,90 (Pedro Oliveira)
-4. **React.js Avançado** - R$ 279,90 (Ana Rodrigues)
-5. **DevOps com AWS** - R$ 449,90 (Pedro Oliveira)
-6. **Node.js e Express** - R$ 259,90 (João Silva) - **INATIVO**
-
-### Estatísticas Iniciais
-- 👥 **5 Alunos** cadastrados
-- 👨‍🏫 **4 Instrutores** cadastrados
-- 📚 **6 Cursos** (5 ativos, 1 inativo)
-- 📝 **10 Inscrições** (6 pagas, 1 confirmada, 3 pendentes)
-- 💰 **6 Pagamentos** aprovados (R$ 2.099,40)
+⚠️ **IMPORTANTE**: Credenciais apenas para testes. Nunca use dados reais!
 
 ---
 
-## ⚠️ IMPORTANTE
+## COMO INICIAR O SERVIDOR
 
-### Para usar os instrutores cadastrados:
-**Você precisa reiniciar o servidor para carregar os CPFs!**
-
+### Método 1: Maven Wrapper (RECOMENDADO para desenvolvimento)
 ```powershell
-# Parar o servidor (Ctrl+C no terminal)
-# Depois executar novamente:
 cd C:\Users\rayel\Documents\GitHub\Projeto-de-Programa-o_N02_Grupo04\plataformacursos\plataformacursos
 .\mvnw.cmd spring-boot:run
 ```
+**Vantagens:**
+- Não precisa compilar o JAR antes
+- Recarrega automaticamente mudanças em código Java
+- Mais prático durante desenvolvimento
 
-### Depois de reiniciar:
-✅ Todos os 4 instrutores poderão fazer login
-✅ Banco de dados será recriado com os CPFs
-✅ Todas as inscrições e pagamentos estarão disponíveis
+### Método 2: Executar JAR compilado (mais rápido se já compilou)
+```powershell
+cd C:\Users\rayel\Documents\GitHub\Projeto-de-Programa-o_N02_Grupo04\plataformacursos\plataformacursos
+java -jar target\plataformacursos-0.0.1-SNAPSHOT.jar
+```
+**Observação:** Se mudou arquivos HTML/CSS/JS, precisa recompilar primeiro:
+```powershell
+.\mvnw.cmd clean package -DskipTests
+```
+
+### Para parar o servidor:
+Pressione **Ctrl+C** no terminal onde o servidor está rodando
 
 ---
 
-## 🔒 SEGURANÇA
+## IMPORTANTE
 
-⚠️ **Este é um sistema de DESENVOLVIMENTO/TESTES**
+### Para apagar e recriar o banco de dados:
+```powershell
+# 1. Parar o servidor (Ctrl+C)
+
+# 2. Apagar o banco de dados
+Remove-Item C:\Users\rayel\Documents\GitHub\Projeto-de-Programa-o_N02_Grupo04\plataformacursos\plataformacursos\data\plataformacursos.mv.db -Force
+
+# 3. Iniciar o servidor novamente (método 1 ou 2 acima)
+```
+
+### Depois de recriar o banco:
+- Apenas 1 instrutor de teste
+- Apenas 1 aluno de teste
+- Banco de dados limpo
+
+---
+
+## SEGURANÇA
+
+**Este é um sistema de DESENVOLVIMENTO/TESTES**
 
 - Senhas são CPFs sem criptografia
 - Sessão armazenada no localStorage
@@ -144,4 +205,4 @@ cd C:\Users\rayel\Documents\GitHub\Projeto-de-Programa-o_N02_Grupo04\plataformac
 
 ---
 
-**Última atualização:** 07/11/2025
+**Última atualização:** 10/11/2025

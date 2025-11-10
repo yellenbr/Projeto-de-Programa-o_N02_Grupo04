@@ -236,7 +236,7 @@
                 <div class="form-group">
                     <label for="cpfAluno">CPF</label>
                     <div class="password-wrapper">
-                        <input type="password" id="cpfAluno" placeholder="000.000.000-00" maxlength="14" required>
+                        <input type="password" id="cpfAluno" placeholder="CPF" maxlength="11" required>
                         <button type="button" class="toggle-password" onclick="togglePassword('cpfAluno')">
                             <svg id="icon-cpfAluno" viewBox="0 0 24 24">
                                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -244,6 +244,9 @@
                             </svg>
                         </button>
                     </div>
+                    <small style="color: #6b7280; font-size: 0.75rem; margin-top: 0.25rem; display: block;">
+                        Digite apenas os números do CPF 
+                    </small>
                 </div>
                 <button type="submit" class="btn-login">
                     Entrar como Aluno
@@ -257,9 +260,9 @@
                     <input type="email" id="emailInstrutor" placeholder="instrutor@email.com" required>
                 </div>
                 <div class="form-group">
-                    <label for="senhaInstrutor">Senha (CPF)</label>
+                    <label for="senhaInstrutor">Senha</label>
                     <div class="password-wrapper">
-                        <input type="password" id="senhaInstrutor" placeholder="Digite seu CPF" required>
+                        <input type="password" id="senhaInstrutor" placeholder="Digite a senha" required maxlength="8">
                         <button type="button" class="toggle-password" onclick="togglePassword('senhaInstrutor')">
                             <svg id="icon-senhaInstrutor" viewBox="0 0 24 24">
                                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -267,6 +270,9 @@
                             </svg>
                         </button>
                     </div>
+                    <small style="color: #6b7280; font-size: 0.75rem; margin-top: 0.25rem; display: block;">
+                        Senha com até 8 caracteres
+                    </small>
                 </div>
                 <button type="submit" class="btn-login">
                     Entrar como Instrutor
@@ -276,13 +282,13 @@
             <!-- Login Admin -->
             <form id="formAdmin" class="login-form" onsubmit="login(event, 'admin')">
                 <div class="form-group">
-                    <label for="usuarioAdmin">Usuário</label>
-                    <input type="text" id="usuarioAdmin" placeholder="admin" required>
+                    <label for="emailAdmin">Email</label>
+                    <input type="email" id="emailAdmin" placeholder="admin@veridia.com" required>
                 </div>
                 <div class="form-group">
                     <label for="senhaAdmin">Senha</label>
                     <div class="password-wrapper">
-                        <input type="password" id="senhaAdmin" placeholder="Digite a senha" required>
+                        <input type="password" id="senhaAdmin" placeholder="Digite a senha" required maxlength="8">
                         <button type="button" class="toggle-password" onclick="togglePassword('senhaAdmin')">
                             <svg id="icon-senhaAdmin" viewBox="0 0 24 24">
                                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -290,6 +296,9 @@
                             </svg>
                         </button>
                     </div>
+                    <small style="color: #6b7280; font-size: 0.75rem; margin-top: 0.25rem; display: block;">
+                        Senha com até 8 caracteres
+                    </small>
                 </div>
                 <button type="submit" class="btn-login">
                     Entrar como Administrador
@@ -298,20 +307,19 @@
         </div>
     </div>
 
+    <script src="js/app.js"></script>
     <script>
-        const API_URL = 'http://localhost:8080/api';
-
         function togglePassword(inputId) {
             const input = document.getElementById(inputId);
             const icon = document.getElementById('icon-' + inputId);
             
             if (input.type === 'password') {
                 input.type = 'text';
-                // Trocar para ícone de olho cortado (senha visível)
+                
                 icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
             } else {
                 input.type = 'password';
-                // Voltar para ícone de olho normal (senha oculta)
+                
                 icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
             }
         }
@@ -324,19 +332,19 @@
                 document.getElementById('emailInstrutor').value = '';
                 document.getElementById('senhaInstrutor').value = '';
             } else if (tipo === 'admin') {
-                document.getElementById('usuarioAdmin').value = '';
+                document.getElementById('emailAdmin').value = '';
                 document.getElementById('senhaAdmin').value = '';
             }
         }
 
         function switchTab(tipo) {
-            // Atualizar tabs
+            
             document.querySelectorAll('.login-tab').forEach(tab => {
                 tab.classList.remove('active');
             });
             event.target.classList.add('active');
 
-            // Atualizar forms
+            
             document.querySelectorAll('.login-form').forEach(form => {
                 form.classList.remove('active');
             });
@@ -355,7 +363,7 @@
                     
                     console.log('Tentando login - Email:', email, 'CPF:', cpf);
                     
-                    // Buscar aluno por email
+                    
                     const response = await fetch(`${API_URL}/alunos`);
                     const alunos = await response.json();
                     
@@ -370,12 +378,12 @@
 
                 } else if (tipo === 'instrutor') {
                     const email = document.getElementById('emailInstrutor').value.trim();
-                    const senha = document.getElementById('senhaInstrutor').value.replace(/\D/g, '');
+                    const senha = document.getElementById('senhaInstrutor').value.trim();
                     
-                    // Buscar instrutor por email
+                    
                     const response = await fetch(`${API_URL}/instrutores`);
                     const instrutores = await response.json();
-                    userData = instrutores.find(i => i.email.toLowerCase() === email.toLowerCase() && i.cpf === senha);
+                    userData = instrutores.find(i => i.email.toLowerCase() === email.toLowerCase() && i.senha === senha);
                     
                     if (!userData) {
                         showAlert('Instrutor não encontrado! Verifique suas credenciais.', 'error');
@@ -383,18 +391,18 @@
                     }
 
                 } else if (tipo === 'admin') {
-                    const usuario = document.getElementById('usuarioAdmin').value;
+                    const email = document.getElementById('emailAdmin').value.trim();
                     const senha = document.getElementById('senhaAdmin').value;
                     
-                    if (usuario === 'admin' && senha === 'admin123') {
-                        userData = { id: 0, nome: 'Administrador', tipo: 'admin' };
+                    if (email === 'admin@veridia.com' && senha === 'admin123') {
+                        userData = { id: 0, nome: 'Administrador', email: email, tipo: 'admin' };
                     } else {
                         showAlert('Credenciais de administrador inválidas!', 'error');
                         return;
                     }
                 }
 
-                // Salvar sessão
+                
                 const session = {
                     tipo: tipo,
                     usuario: userData,
@@ -405,10 +413,10 @@
                 
                 showAlert('Login realizado com sucesso! Redirecionando...', 'success');
                 
-                // Limpar os campos do formulário
+                
                 clearForm(tipo);
                 
-                // Redirecionar para a página apropriada
+                
                 setTimeout(() => {
                     if (tipo === 'aluno') {
                         window.location.href = 'aluno.html';
@@ -434,18 +442,15 @@
             }, 5000);
         }
 
-        // Formatar CPF automaticamente (apenas quando visível como texto)
+    
         document.getElementById('cpfAluno').addEventListener('input', function(e) {
-            if (e.target.type === 'text') {
-                let value = e.target.value.replace(/\D/g, '');
-                if (value.length <= 11) {
-                    value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-                    e.target.value = value;
-                }
+            let value = e.target.value.replace(/\D/g, '');
+        
+            if (value.length > 11) {
+                value = value.substring(0, 11);
             }
+            e.target.value = value;
         });
-
-        // Verificar se já está logado
         window.addEventListener('load', () => {
             const session = localStorage.getItem('session');
             if (session) {
@@ -456,7 +461,6 @@
                     else if (tipo === 'instrutor') window.location.href = 'instrutor.html';
                     else window.location.href = 'index.html';
                 } else {
-                    // Fazer logout
                     localStorage.removeItem('session');
                     showAlert('Sessão anterior encerrada. Faça login novamente.', 'success');
                 }

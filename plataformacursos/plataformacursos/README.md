@@ -1,231 +1,216 @@
-# 🎓 Plataforma Veridia Cursos
+# Plataforma Veridia Cursos
 
-Sistema de gerenciamento de cursos online desenvolvido com Spring Boot para a gestão completa de alunos, instrutores, cursos, inscrições e pagamentos.
+## Objetivo do Módulo Desenvolvido
 
-## 📋 Sobre o Projeto
+Sistema completo de gerenciamento de cursos online que permite:
 
-A Plataforma Veridia Cursos é uma aplicação web completa que permite:
-- Cadastro e gerenciamento de alunos
-- Cadastro e gerenciamento de instrutores
-- Criação e administração de cursos
-- Sistema de inscrições com controle de vagas
-- Processamento de pagamentos
-- Controle de transferências entre cursos
-- Sistema de reembolso
+- **Gestão de Alunos**: Cadastro, autenticação e gerenciamento de perfil de estudantes
+- **Gestão de Instrutores**: Cadastro e administração de professores e seus cursos
+- **Gestão de Cursos**: Criação, edição e controle de cursos com limite de vagas
+- **Sistema de Inscrições**: Processo completo de matrícula com controle de vagas e validações
+- **Processamento de Pagamentos**: Sistema de pagamento com múltiplos métodos (PIX, Cartão, Boleto)
+- **Transferências e Reembolsos**: Regras de negócio para mudança de curso e cancelamento
+- **Interface Web Responsiva**: Frontend completo com HTML, CSS e JavaScript vanilla
 
-## 🚀 Tecnologias Utilizadas
+## Bibliotecas Utilizadas
 
-- **Java 17** - LTS (Long Term Support)
-- **Spring Boot 3.5.6** - Framework principal
-- **Spring Data JPA** - Persistência de dados
-- **Spring Security** - Segurança e autenticação
-- **Hibernate** - ORM (Object-Relational Mapping)
-- **H2 Database** - Banco de dados em memória para desenvolvimento
-- **MySQL** - Banco de dados para produção
-- **Maven** - Gerenciamento de dependências
-- **Lombok** - Redução de código boilerplate
+### Backend
+- **Spring Boot 3.5.6** - Framework principal para desenvolvimento da aplicação
+- **Spring Data JPA** - Abstração para persistência de dados
+- **Hibernate** - ORM (Object-Relational Mapping) para mapeamento objeto-relacional
+- **H2 Database 2.3.232** - Banco de dados em memória para desenvolvimento
+- **Jackson** - Serialização/deserialização JSON
+- **Lombok** - Redução de código boilerplate através de anotações
+- **Maven** - Gerenciamento de dependências e build
 
-## Pré-requisitos
+### Frontend
+- **HTML5** - Estrutura das páginas web
+- **CSS3** - Estilização e design responsivo
+- **JavaScript (ES6+)** - Lógica do frontend e comunicação com API REST
+- **Fetch API** - Requisições HTTP assíncronas
 
-- Java JDK 17 ou superior
-- Maven 3.8+ (ou use o Maven Wrapper incluído no projeto)
-- IDE de sua preferência (IntelliJ IDEA, Eclipse, VS Code)
+### Ferramentas de Desenvolvimento
+- **Java 17 LTS** - Linguagem de programação
+- **Maven Wrapper** - Gerenciador de build incluído no projeto
+- **Git** - Controle de versão
 
-## Instalação e Execução
+## Instruções de Execução
 
-### 1. Clone o repositório
+### Pré-requisitos
+- Java JDK 17 ou superior instalado
+- Maven 3.8+ (ou use o Maven Wrapper incluído)
+- Navegador web moderno (Chrome, Firefox, Edge)
+- Git para clonar o repositório
 
+### Passo a Passo
+
+1. **Clone o repositório**
 ```bash
 git clone https://github.com/yellenbr/Projeto-de-Programa-o_N02_Grupo04.git
 cd Projeto-de-Programa-o_N02_Grupo04/plataformacursos/plataformacursos
 ```
 
-### 2. Compile o projeto
-
+2. **Compile o projeto**
 ```bash
-# No Windows
-.\mvnw.cmd clean install
+# Windows
+.\mvnw.cmd clean compile
 
-# No Linux/Mac
-./mvnw clean install
+# Linux/Mac
+./mvnw clean compile
 ```
 
-### 3. Execute a aplicação
-
+3. **Execute a aplicação**
 ```bash
-# No Windows
+# Windows
 .\mvnw.cmd spring-boot:run
 
-# No Linux/Mac
+# Linux/Mac
 ./mvnw spring-boot:run
 ```
 
-A aplicação estará disponível em: **http://localhost:8080**
+4. **Acesse a aplicação**
+- Abra o navegador e acesse: **http://localhost:8080**
+- Para acessar o console do banco H2: **http://localhost:8080/h2-console**
+  - JDBC URL: `jdbc:h2:file:./data/plataformacursos`
+  - Username: `sa`
+  - Password: (deixe em branco)
 
-## Estrutura do Projeto
+### Credenciais de Teste
 
-```
-plataformacursos/
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── com/veridia/gestao/plataformacursos/
-│   │   │       ├── controller/      # Controllers REST
-│   │   │       ├── dto/             # Data Transfer Objects
-│   │   │       ├── exception/       # Tratamento de exceções
-│   │   │       ├── model/           # Entidades JPA
-│   │   │       ├── repository/      # Repositórios JPA
-│   │   │       └── service/         # Lógica de negócio
-│   │   └── resources/
-│   │       ├── static/              # Arquivos estáticos (HTML, CSS, JS)
-│   │       ├── application.properties
-│   │       └── data.sql             # Dados iniciais
-│   └── test/                        # Testes unitários e integração
-├── pom.xml                          # Configuração Maven
-└── README.md
-```
+**Aluno:**
+- Email: `joao.santos@email.com`
+- Senha: `senha123`
 
-## 🌐 Endpoints da API
+**Instrutor:**
+- Email: `carlos.silva@email.com`
+- Senha: `senha123`
 
-### Alunos
-- `GET /api/alunos` - Listar todos os alunos
-- `GET /api/alunos/{id}` - Buscar aluno por ID
-- `POST /api/alunos` - Criar novo aluno
-- `PUT /api/alunos/{id}` - Atualizar aluno
-- `DELETE /api/alunos/{id}` - Deletar aluno
+## Responsabilidades de Cada Integrante
 
-### Cursos
-- `GET /api/cursos` - Listar todos os cursos
-- `GET /api/cursos/{id}` - Buscar curso por ID
-- `GET /api/cursos/nome/{nome}` - Buscar cursos por nome
-- `GET /api/cursos/instrutor/{instrutorId}` - Listar cursos de um instrutor
-- `POST /api/cursos` - Criar novo curso
-- `PUT /api/cursos/{id}` - Atualizar curso
-- `DELETE /api/cursos/{id}` - Deletar curso
+### Ianca Carolinne Carregosa Silva
+- **Controllers**: Desenvolvimento de todos os controllers REST (AlunoController, CursoController, InstrutorController, PagamentoController, AlunoFluxoController, TesteController)
+- **Documentação**: Contribuição na documentação técnica e guias de uso
 
-### Instrutores
-- `GET /api/instrutores` - Listar todos os instrutores
-- `GET /api/instrutores/{id}` - Buscar instrutor por ID
-- `POST /api/instrutores` - Criar novo instrutor
-- `POST /api/instrutores/{instrutorId}/cursos/{cursoId}` - Vincular curso ao instrutor
-- `PUT /api/instrutores/{id}` - Atualizar instrutor
-- `DELETE /api/instrutores/{id}` - Deletar instrutor
+### Ana Sofia Ribeiro de Meneses e Rocha Almeida
+- **Services**: Implementação da camada de serviços com lógica de negócio (AlunoService, CursoService, InstrutorService, InscricaoService, PagamentoService)
+- **Documentação**: Elaboração de documentação de arquitetura e fluxos do sistema
 
-### Inscrições
-- `GET /api/alunos/{alunoId}/inscricoes` - Listar inscrições de um aluno
-- `POST /api/alunos/{alunoId}/inscricoes/{cursoId}` - Criar nova inscrição
-- `DELETE /api/alunos/{alunoId}/inscricoes/{inscricaoId}` - Cancelar inscrição
+### Luan
+- **Repository**: Criação das interfaces de repositório JPA (AlunoRepository, CursoRepository, InstrutorRepository, InscricaoRepository, PagamentoRepository)
+- **Documentação**: Documentação do modelo de dados e queries
 
-### Pagamentos
-- `GET /api/pagamentos` - Listar todos os pagamentos
-- `GET /api/pagamentos/{id}` - Buscar pagamento por ID
-- `POST /api/pagamentos` - Processar novo pagamento
-- `PUT /api/pagamentos/{id}/aprovar` - Aprovar pagamento
-- `PUT /api/pagamentos/{id}/recusar` - Recusar pagamento
-- `DELETE /api/pagamentos/{id}` - Deletar pagamento
+### Aluno 2
+- **Resources**: Desenvolvimento dos recursos estáticos (HTML, CSS, JavaScript) e arquivos de configuração (application.properties, data.sql)
+- **Documentação**: Documentação de frontend e guia de interface
 
-## Banco de Dados
+### Aluno 3
+- **DTOs**: Criação dos Data Transfer Objects (ReembolsoDTO, TransferenciaDTO)
+- **Exception**: Implementação do sistema de tratamento de exceções (GlobalExceptionHandler, NegocioException, RecursoNaoEncontradoException, ValidacaoException)
+- **Documentação**: Documentação de exceções e tratamento de erros
 
-### H2 Console (Desenvolvimento)
+### Rayelen de Jesus Oliveira
+- **Models**: Modelagem e implementação das entidades JPA (Aluno, Curso, Instrutor, Inscricao, Pagamento) com regras de negócio
+- **Banco de Dados**: Configuração e estruturação do banco de dados H2, incluindo scripts SQL e relacionamentos
+- **Testes**: Criação e execução de testes unitários e de integração
+- **README**: Elaboração deste arquivo README.md com toda documentação do projeto
 
-Acesse o console do H2 em: **http://localhost:8080/h2-console**
+## Prints ou Exemplos de Saída
 
-Configurações de conexão:
-- **JDBC URL:** `jdbc:h2:file:./data/plataformacursos`
-- **Username:** `SA`
-- **Password:** (deixe em branco)
+### Tela de Login
+- Interface de autenticação com seleção de tipo de usuário (Aluno/Instrutor)
+- Validação de credenciais e redirecionamento para dashboard apropriado
 
-### MySQL (Produção)
+### Dashboard do Aluno
+- **Meus Dados**: Estatísticas de cursos inscritos, concluídos e gasto total
+- **Cursos Disponíveis**: Catálogo de cursos com filtros e botão de inscrição
+- **Minhas Inscrições**: Lista de cursos matriculados com status e ações
+- **Meus Pagamentos**: Histórico de transações financeiras
 
-Para usar MySQL em produção, atualize o `application.properties`:
+### Dashboard do Instrutor
+- **Meus Dados**: Total de cursos, alunos e receita gerada
+- **Meus Cursos**: Gerenciamento de cursos criados com botão "Ver Alunos"
+- **Criar Curso**: Formulário para cadastro de novos cursos
+- **Alunos Inscritos**: Visualização de todos os alunos matriculados
 
-```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/plataformacursos
-spring.datasource.username=seu_usuario
-spring.datasource.password=sua_senha
-spring.jpa.hibernate.ddl-auto=update
-```
+### Funcionalidades Principais
+1. **Inscrição em Curso**: Aluno pode se inscrever em cursos disponíveis (máximo 5 ativos)
+2. **Pagamento**: Processo de pagamento com seleção de método (PIX, Cartão, Boleto)
+3. **Validação de Duplicatas**: Sistema impede inscrição duplicada no mesmo curso
+4. **Ver Alunos (Instrutor)**: Modal mostrando lista completa de alunos inscritos por curso
+5. **Transferência de Curso**: Aluno pode mudar de curso antes do início
+6. **Cancelamento e Reembolso**: Sistema de cancelamento com reembolso automático
 
-## Modelo de Dados
+### Exemplo de Resposta da API
 
-### Principais Entidades
-
-- **Aluno**: Gerencia informações dos estudantes
-- **Instrutor**: Gerencia informações dos professores
-- **Curso**: Contém detalhes dos cursos oferecidos
-- **Inscricao**: Relaciona alunos com cursos
-- **Pagamento**: Controla transações financeiras
-
-### Status de Inscrição
-
-- `PENDENTE` - Inscrito mas não pagou
-- `PAGO` - Pagamento confirmado
-- `CONFIRMADA` - Inscrição confirmada pelo sistema
-- `CANCELADA` - Cancelada pelo aluno
-- `REEMBOLSADA` - Reembolso processado
-- `CONCLUIDA` - Curso finalizado
-
-## Segurança
-
-O projeto utiliza Spring Security para:
-- Autenticação de usuários
-- Autorização baseada em roles
-- Proteção contra CSRF
-- Criptografia de senhas
-
-## Testes
-
-Execute os testes com:
-
-```bash
-# No Windows
-.\mvnw.cmd test
-
-# No Linux/Mac
-./mvnw test
+**GET /api/cursos**
+```json
+[
+  {
+    "id": 1,
+    "nome": "Java Completo 2025",
+    "descricao": "Curso completo de Java",
+    "preco": 500.00,
+    "cargaHoraria": 120,
+    "limiteVagas": 60,
+    "numeroInscritos": 3,
+    "ativo": true,
+    "instrutor": {
+      "id": 1,
+      "nome": "Carlos Silva"
+    }
+  }
+]
 ```
 
-## Regras de Negócio
+**POST /api/alunos/{alunoId}/inscrever/{cursoId}**
+```json
+{
+  "id": 4,
+  "aluno": 1,
+  "curso": 1,
+  "status": "PENDENTE",
+  "dataInscricao": "2025-11-10T19:30:00"
+}
+```
 
-### Inscrições
-- Aluno pode ter no máximo 5 cursos ativos simultaneamente
-- Curso possui limite de vagas configurável
-- Sistema controla automaticamente disponibilidade de vagas
+## Estrutura do Código
 
-### Pagamentos
-- Reembolso permitido apenas se o curso não começou
-- Pagamento deve ser aprovado para confirmar inscrição
+```
+src/
+├── main/
+│   ├── java/com/veridia/gestao/plataformacursos/
+│   │   ├── controller/          # REST Controllers
+│   │   ├── dto/                 # Data Transfer Objects
+│   │   ├── exception/           # Tratamento de exceções
+│   │   ├── model/               # Entidades JPA
+│   │   ├── repository/          # Interfaces JPA Repository
+│   │   └── service/             # Lógica de negócio
+│   └── resources/
+│       ├── static/              # Frontend (HTML, CSS, JS)
+│       ├── application.properties
+│       └── data.sql             # Dados iniciais
+└── test/                        # Testes automatizados
+```
 
-### Transferências
-- Aluno pode transferir para outro curso antes do início
-- Sistema valida disponibilidade de vagas no curso destino
+## Regras de Negócio Implementadas
 
-## Contribuindo
-
-1. Faça um Fork do projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abra um Pull Request
-
-## Licença
-
-Este projeto foi desenvolvido para fins educacionais.
-
-## Equipe
-
-**Grupo 04** - Projeto de Programação N02
-
-Rayelen Oliveira
-Ana Sofia
-Ianca
-Leo
-Heitor
-
-## Suporte
-
-Para reportar bugs ou solicitar features, abra uma [issue](https://github.com/yellenbr/Projeto-de-Programa-o_N02_Grupo04/issues).
+1. **Limite de Cursos por Aluno**: Máximo de 5 cursos ativos simultaneamente
+2. **Controle de Vagas**: Validação automática de disponibilidade de vagas
+3. **Inscrição Única**: Aluno não pode se inscrever duas vezes no mesmo curso
+4. **Reembolso Condicional**: Permitido apenas se o curso não iniciou
+5. **Status de Inscrição**: PENDENTE → PAGO → CONFIRMADA → CONCLUIDA
+6. **Transferência de Curso**: Validação de vagas no curso destino
 
 ---
 
-Desenvolvido com Spring Boot e Java 17
+**Desenvolvido por Grupo 04 - Projeto de Programação N02**
+
+**Tecnologias:** Java 17 | Spring Boot 3.5.6 | H2 Database | HTML5 | CSS3 | JavaScript ES6+
+
+
+---
+
+**Desenvolvido por Grupo 04 - Projeto de Programação N02**
+
+**Tecnologias:** Java 17 | Spring Boot 3.5.6 | H2 Database | HTML5 | CSS3 | JavaScript ES6+
+

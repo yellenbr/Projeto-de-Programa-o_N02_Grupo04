@@ -1,10 +1,13 @@
 package com.veridia.gestao.plataformacursos.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Aluno {
 
     @Id
@@ -60,7 +63,7 @@ public class Aluno {
     }
 
     public Integer getNumeroCursosAtivos() {
-        return numeroCursosAtivos;
+        return numeroCursosAtivos != null ? numeroCursosAtivos : 0;
     }
 
     public void setNumeroCursosAtivos(Integer numeroCursosAtivos) {
@@ -77,8 +80,14 @@ public class Aluno {
 
     // Métodos de negócio
     public boolean podeSeInscrever(Curso curso) {
-        // Limite máximo de 5 cursos ativos por aluno
-        return numeroCursosAtivos < 5;
+        if (curso == null || !curso.getAtivo()) {
+            return false;
+        }
+        if (!curso.temVagasDisponiveis()) {
+            return false;
+        }
+        int cursosAtivos = (numeroCursosAtivos != null) ? numeroCursosAtivos : 0;
+        return cursosAtivos < 5;
     }
 
     public boolean temInscricoesPendentes() {

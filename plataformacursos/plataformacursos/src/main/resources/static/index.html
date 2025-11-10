@@ -6,7 +6,7 @@
     <title>Veridia - Plataforma de Cursos</title>
     <link rel="stylesheet" href="css/style.css">
     <script>
-        // Funções necessárias antes do carregamento da página
+        
         function logout() {
             if (confirm('Deseja realmente sair?')) {
                 localStorage.removeItem('session');
@@ -27,36 +27,36 @@
         <header>
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
-                    <h1>⚙️ Painel Administrativo - Veridia</h1>
+                    <h1>Painel Administrativo - Veridia</h1>
                     <p>Sistema de Gestão de Cursos Online - Área do Administrador</p>
                 </div>
                 <button onclick="logout()" class="btn-outline" title="Sair do sistema">
-                    🚪 Sair
+                    Sair
                 </button>
             </div>
         </header>
 
         <nav class="menu">
             <button onclick="showSection('dashboard')" class="nav-btn active">
-                <span>📊</span> Dashboard
+                <span></span> Dashboard
             </button>
             <button onclick="showSection('alunos')" class="nav-btn">
-                <span>👥</span> Alunos
+                <span></span> Alunos
             </button>
             <button onclick="showSection('cursos')" class="nav-btn">
-                <span>📚</span> Cursos
+                <span></span> Cursos
             </button>
             <button onclick="showSection('instrutores')" class="nav-btn">
-                <span>👨‍🏫</span> Instrutores
+                <span></span> Instrutores
             </button>
             <button onclick="showSection('inscricoes')" class="nav-btn">
-                <span>📝</span> Inscrições
+                <span></span> Inscrições
             </button>
         </nav>
 
         <!-- DASHBOARD -->
         <section id="dashboard" class="content-section active">
-            <h2>📊 Dashboard</h2>
+            <h2>Dashboard</h2>
             <div class="stats-grid">
                 <div class="stat-card">
                     <h3 id="totalAlunos">0</h3>
@@ -78,16 +78,16 @@
             
             <div class="section-grid">
                 <div class="info-section">
-                    <h3>🎯 Links Úteis</h3>
+                    <h3>Links Úteis</h3>
                     <ul>
-                        <li><a href="/h2-console" target="_blank">🗄️ Console H2 Database</a></li>
-                        <li><a href="/api/teste/status" target="_blank">🔍 Status da API</a></li>
-                        <li><a href="/api/teste/dados" target="_blank">📊 Ver Todos os Dados</a></li>
+                        <li><a href="/h2-console" target="_blank">Console H2 Database</a></li>
+                        <li><a href="/api/teste/status" target="_blank">Status da API</a></li>
+                        <li><a href="/api/teste/dados" target="_blank">Ver Todos os Dados</a></li>
                     </ul>
                 </div>
                 
                 <div class="info-section">
-                    <h3>ℹ️ Informações do Sistema</h3>
+                    <h3>Informações do Sistema</h3>
                     <p><strong>Versão:</strong> 1.0.0</p>
                     <p><strong>Framework:</strong> Spring Boot 3.5.6</p>
                     <p><strong>Banco:</strong> H2 Database</p>
@@ -98,7 +98,7 @@
 
         <!-- ALUNOS -->
         <section id="alunos" class="content-section">
-            <h2>👥 Gerenciar Alunos</h2>
+            <h2>Gerenciar Alunos</h2>
             
             <div class="actions">
                 <button onclick="showModalAluno()" class="btn-primary">
@@ -135,14 +135,14 @@
 
         <!-- CURSOS -->
         <section id="cursos" class="content-section">
-            <h2>📚 Gerenciar Cursos</h2>
+            <h2>Gerenciar Cursos</h2>
             
             <div class="actions">
                 <button onclick="showModalCurso()" class="btn-primary">
-                    <span>➕</span> Novo Curso
+                    <span></span> Novo Curso
                 </button>
                 <button onclick="carregarCursos()" class="btn-outline">
-                    <span>🔄</span> Atualizar
+                    <span></span> Atualizar
                 </button>
             </div>
 
@@ -157,20 +157,20 @@
 
         <!-- INSTRUTORES -->
         <section id="instrutores" class="content-section">
-            <h2>👨‍🏫 Gerenciar Instrutores</h2>
+            <h2>Gerenciar Instrutores</h2>
             
             <div class="actions">
                 <button onclick="showModalInstrutor()" class="btn-primary">
-                    <span>➕</span> Novo Instrutor
+                    <span></span> Novo Instrutor
                 </button>
                 <button onclick="carregarInstrutores()" class="btn-outline">
-                    <span>🔄</span> Atualizar
+                    <span></span> Atualizar
                 </button>
             </div>
 
             <div id="listaInstrutores" class="data-list">
                 <div class="empty-state">
-                    <div class="empty-state-icon">👨‍🏫</div>
+                    <div class="empty-state-icon"></div>
                     <h3>Nenhum instrutor cadastrado</h3>
                     <p>Clique no botão "Novo Instrutor" acima para começar a adicionar instrutores à plataforma.</p>
                 </div>
@@ -179,20 +179,20 @@
 
         <!-- INSCRIÇÕES -->
         <section id="inscricoes" class="content-section">
-            <h2>📝 Gerenciar Inscrições</h2>
+            <h2>Gerenciar Inscrições</h2>
             
             <div class="actions">
                 <button onclick="showModalInscricao()" class="btn-primary">
-                    <span>➕</span> Nova Inscrição
+                    <span></span> Nova Inscrição
                 </button>
                 <button onclick="carregarInscricoes()" class="btn-outline">
-                    <span>🔄</span> Atualizar
+                    <span></span> Atualizar
                 </button>
             </div>
 
             <div id="listaInscricoes" class="data-list">
                 <div class="empty-state">
-                    <div class="empty-state-icon">📝</div>
+                    <div class="empty-state-icon"></div>
                     <h3>Nenhuma inscrição realizada</h3>
                     <p>Clique no botão "Nova Inscrição" acima para começar a inscrever alunos nos cursos.</p>
                 </div>

@@ -1,11 +1,14 @@
 package com.veridia.gestao.plataformacursos.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 @Entity
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Instrutor {
 
     @Id
@@ -15,6 +18,7 @@ public class Instrutor {
     private String nome;
     private String email;
     private String cpf;
+    private String senha;
     private String especialidade;
 
     public Instrutor() {}
@@ -64,5 +68,13 @@ public class Instrutor {
 
     public void setEspecialidade(String especialidade) {
         this.especialidade = especialidade;
+    }
+
+    public String getSenha() {
+        return senha;
+    }
+
+    public void setSenha(String senha) {
+        this.senha = senha;
     }
 }

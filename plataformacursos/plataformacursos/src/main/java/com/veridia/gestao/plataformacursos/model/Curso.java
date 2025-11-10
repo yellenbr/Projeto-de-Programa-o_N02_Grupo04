@@ -1,5 +1,7 @@
 package com.veridia.gestao.plataformacursos.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -8,6 +10,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "cursos")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Curso {
 
     @Id
@@ -97,7 +100,7 @@ public class Curso {
     }
 
     public Boolean getAtivo() {
-        return ativo;
+        return ativo != null ? ativo : true;
     }
 
     public void setAtivo(Boolean ativo) {

@@ -86,8 +86,6 @@ Senha: admin123</pre>
     </div>
 
     <script>
-        const API_URL = 'http://localhost:8080/api';
-
         async function listarAlunos() {
             try {
                 const response = await fetch(`${API_URL}/alunos`);
@@ -128,7 +126,7 @@ Senha: admin123</pre>
             try {
                 let resultados = [];
 
-                // Verificar/Criar Aluno de Teste
+                
                 const alunosResp = await fetch(`${API_URL}/alunos`);
                 const alunos = await alunosResp.json();
                 let alunoTeste = alunos.find(a => a.email === 'aluno@teste.com');
@@ -149,7 +147,7 @@ Senha: admin123</pre>
                     resultados.push('ℹAluno de teste já existe: ' + JSON.stringify(alunoTeste));
                 }
 
-                // Verificar/Criar Instrutor de Teste
+                
                 const instrutoresResp = await fetch(`${API_URL}/instrutores`);
                 const instrutores = await instrutoresResp.json();
                 let instrutorTeste = instrutores.find(i => i.email === 'instrutor@teste.com');
@@ -180,7 +178,7 @@ Senha: admin123</pre>
         function limparSessao() {
             localStorage.removeItem('session');
             mostrarSessao();
-            document.getElementById('resultado').innerHTML = '<p style="color: green;"> Sessão limpa com sucesso!</p>';
+            document.getElementById('resultado').innerHTML = '<p style="color: green;">d Sessão limpa com sucesso!</p>';
         }
 
         function mostrarSessao() {
@@ -200,7 +198,7 @@ Senha: admin123</pre>
             }
         }
 
-        // Mostrar sessão ao carregar
+        
         window.addEventListener('load', mostrarSessao);
     </script>
 </body>

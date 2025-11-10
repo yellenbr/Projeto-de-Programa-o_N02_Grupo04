@@ -1,5 +1,7 @@
 package com.veridia.gestao.plataformacursos.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.veridia.gestao.plataformacursos.exception.NegocioException;
 import com.veridia.gestao.plataformacursos.exception.ValidacaoException;
 import jakarta.persistence.*;
@@ -7,6 +9,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "inscricoes")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Inscricao {
 
     @Id
