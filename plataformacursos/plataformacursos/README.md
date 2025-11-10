@@ -95,15 +95,15 @@ cd Projeto-de-Programa-o_N02_Grupo04/plataformacursos/plataformacursos
 - **Services**: Implementação da camada de serviços com lógica de negócio (AlunoService, CursoService, InstrutorService, InscricaoService, PagamentoService)
 - **Documentação**: Elaboração de documentação de arquitetura e fluxos do sistema
 
-### Luan
+### Luan Gouveia Falcão dos Anjos
 - **Repository**: Criação das interfaces de repositório JPA (AlunoRepository, CursoRepository, InstrutorRepository, InscricaoRepository, PagamentoRepository)
 - **Documentação**: Documentação do modelo de dados e queries
 
-### Aluno 2
+### Heitor Fernando Feitosa Vieira
 - **Resources**: Desenvolvimento dos recursos estáticos (HTML, CSS, JavaScript) e arquivos de configuração (application.properties, data.sql)
 - **Documentação**: Documentação de frontend e guia de interface
 
-### Aluno 3
+### Mateus da Silva Machado
 - **DTOs**: Criação dos Data Transfer Objects (ReembolsoDTO, TransferenciaDTO)
 - **Exception**: Implementação do sistema de tratamento de exceções (GlobalExceptionHandler, NegocioException, RecursoNaoEncontradoException, ValidacaoException)
 - **Documentação**: Documentação de exceções e tratamento de erros
