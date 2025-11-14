@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Veridia</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #2563eb 0%, #0891b2 100%);
+            padding: 2rem;
+        }
+
+        .login-box {
+            background: white;
+            padding: 3rem;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 450px;
+            width: 100%;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-header h1 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            font-size: 2rem;
+        }
+
+        .login-header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .login-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            background: var(--bg-secondary);
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+
+        .login-tab {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.3s;
+        }
+
+        .login-tab.active {
+            background: white;
+            color: var(--primary-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-form {
+            display: none;
+        }
+
+        .login-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper input {
+            padding-right: 3rem;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 0.875rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 1.25rem;
+            padding: 0.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.3s;
+            width: 24px;
+            height: 24px;
+        }
+
+        .toggle-password:hover {
+            color: var(--primary-color);
+        }
+
+        .toggle-password svg {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+
+        .btn-login:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-register {
+            width: 100%;
+            padding: 1rem;
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 0.5rem;
+        }
+
+        .btn-register:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .divider {
+            text-align: center;
+            margin: 1.5rem 0 1rem;
+            position: relative;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        .divider::before {
+            left: 0;
+        }
+
+        .divider::after {
+            right: 0;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: var(--primary-color);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .close-modal:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+        }
+
+        .alert-error {
+            background: #fee;
+            color: #c00;
+            border: 1px solid #fcc;
+        }
+
+        .alert-success {
+            background: #efe;
+            color: #0a0;
+            border: 1px solid #cfc;
+        }
+
+        .credentials-info {
+            background: #f0f9ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-size: 0.875rem;
+        }
+
+        .credentials-info h4 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .credentials-info code {
+            background: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #0891b2;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <h1>Veridia</h1>
+                <p>Plataforma de Cursos Online</p>
+            </div>
+
+            <div id="alertContainer"></div>
+
+            <div class="login-tabs">
+                <button class="login-tab active" data-tab="aluno" onclick="switchTab('aluno', event)">
+                    Aluno
+                </button>
+                <button class="login-tab" data-tab="instrutor" onclick="switchTab('instrutor', event)">
+                    Instrutor
+                </button>
+            </div>
+
+            <!-- Login Aluno -->
+            <form id="formAluno" class="login-form active" onsubmit="login(event, 'aluno')">
+                <div class="form-group">
+                    <label for="emailAluno">Email</label>
+                    <input type="email" id="emailAluno" placeholder="seu@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="cpfAluno">CPF</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="cpfAluno" placeholder="CPF" maxlength="11" required>
+                        <button type="button" class="toggle-password" onclick="togglePassword('cpfAluno')">
+                            <svg id="icon-cpfAluno" viewBox="0 0 24 24">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                    <small style="color: #6b7280; font-size: 0.75rem; margin-top: 0.25rem; display: block;">
+                        Digite apenas os números do CPF 
+                    </small>
+                </div>
+                <button type="submit" class="btn-login">
+                    Entrar como Aluno
+                </button>
+                
+                <div class="divider">ou</div>
+                
+                <button type="button" class="btn-register" onclick="showRegisterModal('aluno')">
+                    Criar Conta de Aluno
+                </button>
+            </form>
+
+            <!-- Login Instrutor -->
+            <form id="formInstrutor" class="login-form" onsubmit="login(event, 'instrutor')">
+                <div class="form-group">
+                    <label for="emailInstrutor">Email</label>
+                    <input type="email" id="emailInstrutor" placeholder="instrutor@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="senhaInstrutor">Senha</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="senhaInstrutor" placeholder="Digite a senha" required maxlength="8">
+                        <button type="button" class="toggle-password" onclick="togglePassword('senhaInstrutor')">
+                            <svg id="icon-senhaInstrutor" viewBox="0 0 24 24">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                    <small style="color: #6b7280; font-size: 0.75rem; margin-top: 0.25rem; display: block;">
+                        Senha com até 8 caracteres
+                    </small>
+                </div>
+                <button type="submit" class="btn-login">
+                    Entrar como Instrutor
+                </button>
+                
+                <div class="divider">ou</div>
+                
+                <button type="button" class="btn-register" onclick="showRegisterModal('instrutor')">
+                    Criar Conta de Instrutor
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Cadastro de Aluno -->
+    <div id="modalCadastroAluno" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Cadastro de Aluno</h2>
+                <button class="close-modal" onclick="closeRegisterModal('aluno')">&times;</button>
+            </div>
+            <form onsubmit="cadastrarAluno(event)">
+                <div class="form-group">
+                    <label for="nomeAlunoCadastro">Nome Completo *</label>
+                    <input type="text" id="nomeAlunoCadastro" placeholder="Seu nome completo" required>
+                </div>
+                <div class="form-group">
+                    <label for="emailAlunoCadastro">Email *</label>
+                    <input type="email" id="emailAlunoCadastro" placeholder="seu@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="cpfAlunoCadastro">CPF *</label>
+                    <input type="text" id="cpfAlunoCadastro" placeholder="000.000.000-00" maxlength="14" required>
+                    <small style="color: #6b7280; font-size: 0.75rem; margin-top: 0.25rem; display: block;">
+                        Use este CPF como senha para fazer login
+                    </small>
+                </div>
+                <button type="submit" class="btn-login">
+                    Criar Conta
+                </button>
+                <button type="button" class="btn-register" onclick="closeRegisterModal('aluno')">
+                    Cancelar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Cadastro de Instrutor -->
+    <div id="modalCadastroInstrutor" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Cadastro de Instrutor</h2>
+                <button class="close-modal" onclick="closeRegisterModal('instrutor')">&times;</button>
+            </div>
+            <form onsubmit="cadastrarInstrutor(event)">
+                <div class="form-group">
+                    <label for="nomeInstrutorCadastro">Nome Completo *</label>
+                    <input type="text" id="nomeInstrutorCadastro" placeholder="Seu nome completo" required>
+                </div>
+                <div class="form-group">
+                    <label for="emailInstrutorCadastro">Email *</label>
+                    <input type="email" id="emailInstrutorCadastro" placeholder="instrutor@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="especialidadeInstrutorCadastro">Especialidade *</label>
+                    <input type="text" id="especialidadeInstrutorCadastro" placeholder="Ex: Programação, Design, Marketing" required>
+                </div>
+                <div class="form-group">
+                    <label for="senhaInstrutorCadastro">Senha *</label>
+                    <input type="password" id="senhaInstrutorCadastro" placeholder="Máximo 8 caracteres" maxlength="8" required>
+                    <small style="color: #6b7280; font-size: 0.75rem; margin-top: 0.25rem; display: block;">
+                        Use uma senha de até 8 caracteres para fazer login
+                    </small>
+                </div>
+                <div class="form-group">
+                    <label for="senhaInstrutorConfirmar">Confirmar Senha *</label>
+                    <input type="password" id="senhaInstrutorConfirmar" placeholder="Confirme a senha" maxlength="8" required>
+                </div>
+                <button type="submit" class="btn-login">
+                    Criar Conta
+                </button>
+                <button type="button" class="btn-register" onclick="closeRegisterModal('instrutor')">
+                    Cancelar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        // Limpa a sessão anterior ao carregar a página de login para garantir um novo login.
+        localStorage.removeItem('session');
+
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById('icon-' + inputId);
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+            } else {
+                input.type = 'password';
+                icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+            }
+        }
+
+        function clearForm(tipo) {
+            if (tipo === 'aluno') {
+                document.getElementById('emailAluno').value = '';
+                document.getElementById('cpfAluno').value = '';
+            } else if (tipo === 'instrutor') {
+                document.getElementById('emailInstrutor').value = '';
+                document.getElementById('senhaInstrutor').value = '';
+            }
+        }
+
+        function switchTab(tipo, evt) {
+            document.querySelectorAll('.login-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            if (evt && evt.target) {
+                evt.target.classList.add('active');
+            } else {
+                const tabButton = document.querySelector(`.login-tab[data-tab="${tipo}"]`);
+                if (tabButton) {
+                    tabButton.classList.add('active');
+                }
+            }
+
+            document.querySelectorAll('.login-form').forEach(form => {
+                form.classList.remove('active');
+            });
+            const targetForm = document.getElementById('form' + tipo.charAt(0).toUpperCase() + tipo.slice(1));
+            if (targetForm) {
+                targetForm.classList.add('active');
+            }
+        }
+
+        function aplicarParametrosDoLogin() {
+            const params = new URLSearchParams(window.location.search);
+            if (Array.from(params.keys()).length === 0) {
+                return;
+            }
+
+            const tab = params.get('tab');
+            if (tab) {
+                switchTab(tab);
+            }
+
+            const email = params.get('email');
+            if (email) {
+                document.getElementById('emailAluno').value = email;
+            }
+
+            const cpf = params.get('cpf');
+            if (cpf) {
+                document.getElementById('cpfAluno').value = cpf;
+            }
+
+            const mensagem = params.get('message');
+            if (mensagem) {
+                const tipo = params.get('type') || 'info';
+                showAlert(mensagem, tipo);
+            }
+
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
+        function showRegisterModal(tipo) {
+            if (tipo === 'aluno') {
+                document.getElementById('modalCadastroAluno').classList.add('active');
+            } else if (tipo === 'instrutor') {
+                document.getElementById('modalCadastroInstrutor').classList.add('active');
+            }
+        }
+
+        function closeRegisterModal(tipo) {
+            if (tipo === 'aluno') {
+                document.getElementById('modalCadastroAluno').classList.remove('active');
+                document.getElementById('nomeAlunoCadastro').value = '';
+                document.getElementById('emailAlunoCadastro').value = '';
+                document.getElementById('cpfAlunoCadastro').value = '';
+            } else if (tipo === 'instrutor') {
+                document.getElementById('modalCadastroInstrutor').classList.remove('active');
+                document.getElementById('nomeInstrutorCadastro').value = '';
+                document.getElementById('emailInstrutorCadastro').value = '';
+                document.getElementById('especialidadeInstrutorCadastro').value = '';
+                document.getElementById('senhaInstrutorCadastro').value = '';
+                document.getElementById('senhaInstrutorConfirmar').value = '';
+            }
+        }
+
+        async function cadastrarAluno(event) {
+            event.preventDefault();
+            
+            const nome = document.getElementById('nomeAlunoCadastro').value.trim();
+            const email = document.getElementById('emailAlunoCadastro').value.trim();
+            const cpfInput = document.getElementById('cpfAlunoCadastro').value;
+            const cpf = cpfInput.replace(/\D/g, '');
+
+            if (cpf.length !== 11) {
+                showAlert('CPF deve conter 11 dígitos!', 'error');
+                return;
+            }
+
+            try {
+                // Verificar se o email já existe
+                const responseCheck = await fetch(`${API_URL}/alunos`);
+                const alunos = await responseCheck.json();
+                
+                if (alunos.find(a => a.email.toLowerCase() === email.toLowerCase())) {
+                    closeRegisterModal('aluno');
+                    redirectToLoginWithMessage('Este email já está cadastrado! Faça login para continuar.', 'error', { email, tab: 'aluno' });
+                    return;
+                }
+
+                if (alunos.find(a => a.cpf === cpf)) {
+                    closeRegisterModal('aluno');
+                    redirectToLoginWithMessage('ja tem uma conta nesse CPF', 'error', { email, cpf, tab: 'aluno' });
+                    return;
+                }
+
+                const aluno = { nome, email, cpf };
+                
+                const response = await fetch(`${API_URL}/alunos`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(aluno)
+                });
+
+                if (response.ok) {
+                    closeRegisterModal('aluno');
+                    redirectToLoginWithMessage('Cadastro realizado! Faça login para validar sua conta.', 'success', { email, cpf });
+                    return;
+                } else {
+                    let error = {};
+                    try {
+                        error = await response.json();
+                    } catch (e) {
+                        error.mensagem = 'Erro ao criar conta';
+                    }
+
+                    if (response.status === 409 && (error.mensagem || '').toLowerCase().includes('cpf')) {
+                        closeRegisterModal('aluno');
+                        redirectToLoginWithMessage('ja tem uma conta nesse CPF', 'error', { email, cpf, tab: 'aluno' });
+                        return;
+                    }
+
+                    showAlert(error.mensagem || 'Erro ao criar conta', 'error');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showAlert('Erro ao criar conta. Verifique se o servidor está rodando.', 'error');
+            }
+        }
+
+        async function cadastrarInstrutor(event) {
+            event.preventDefault();
+            
+            const nome = document.getElementById('nomeInstrutorCadastro').value.trim();
+            const email = document.getElementById('emailInstrutorCadastro').value.trim();
+            const especialidade = document.getElementById('especialidadeInstrutorCadastro').value.trim();
+            const senha = document.getElementById('senhaInstrutorCadastro').value;
+            const senhaConfirmar = document.getElementById('senhaInstrutorConfirmar').value;
+
+            if (senha !== senhaConfirmar) {
+                showAlert('As senhas não coincidem!', 'error');
+                return;
+            }
+
+            if (senha.length < 4 || senha.length > 8) {
+                showAlert('A senha deve ter entre 4 e 8 caracteres!', 'error');
+                return;
+            }
+
+            try {
+                // Verificar se o email já existe
+                const responseCheck = await fetch(`${API_URL}/instrutores`);
+                const instrutores = await responseCheck.json();
+                
+                if (instrutores.find(i => i.email.toLowerCase() === email.toLowerCase())) {
+                    showAlert('Este email já está cadastrado!', 'error');
+                    return;
+                }
+
+                const instrutor = { nome, email, especialidade, senha };
+                
+                const response = await fetch(`${API_URL}/instrutores`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(instrutor)
+                });
+
+                if (response.ok) {
+                    closeRegisterModal('instrutor');
+                    redirectToLoginWithMessage('Cadastro realizado! Faça login como instrutor para validar sua conta.', 'success', { tab: 'instrutor', email });
+                    return;
+                } else {
+                    const error = await response.json();
+                    showAlert(error.mensagem || 'Erro ao criar conta', 'error');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showAlert('Erro ao criar conta. Verifique se o servidor está rodando.', 'error');
+            }
+        }
+
+        async function login(event, tipo) {
+            event.preventDefault();
+            
+            try {
+                let userData = null;
+                let isAdmin = false;
+
+                if (tipo === 'aluno') {
+                    const email = document.getElementById('emailAluno').value.trim();
+                    const cpf = document.getElementById('cpfAluno').value.replace(/\D/g, '');
+                    
+                    // Verificar se é admin tentando fazer login
+                    if (email === 'admin@veridia.com' && cpf === 'admin123') {
+                        isAdmin = true;
+                        userData = { id: 0, nome: 'Administrador', email: email, tipo: 'admin' };
+                    } else {
+                        console.log('Tentando login - Email:', email, 'CPF:', cpf);
+                        
+                        const response = await fetch(`${API_URL}/alunos`);
+                        const alunos = await response.json();
+                        
+                        console.log('Alunos encontrados:', alunos);
+                        
+                        userData = alunos.find(a => a.email.toLowerCase() === email.toLowerCase() && a.cpf === cpf);
+                        
+                        if (!userData) {
+                            showAlert('Aluno não encontrado! Verifique suas credenciais ou crie uma conta.', 'error');
+                            return;
+                        }
+                    }
+
+                } else if (tipo === 'instrutor') {
+                    const email = document.getElementById('emailInstrutor').value.trim();
+                    const senha = document.getElementById('senhaInstrutor').value.trim();
+                    
+                    // Verificar se é admin tentando fazer login
+                    if (email === 'admin@veridia.com' && senha === 'admin123') {
+                        isAdmin = true;
+                        userData = { id: 0, nome: 'Administrador', email: email, tipo: 'admin' };
+                    } else {
+                        const response = await fetch(`${API_URL}/instrutores`);
+                        const instrutores = await response.json();
+                        userData = instrutores.find(i => i.email.toLowerCase() === email.toLowerCase() && i.senha === senha);
+                        
+                        if (!userData) {
+                            showAlert('Instrutor não encontrado! Verifique suas credenciais ou crie uma conta.', 'error');
+                            return;
+                        }
+                    }
+                }
+
+                const session = {
+                    tipo: isAdmin ? 'admin' : tipo,
+                    usuario: userData,
+                    loginTime: new Date().toISOString()
+                };
+                
+                localStorage.setItem('session', JSON.stringify(session));
+                
+                showAlert('Login realizado com sucesso! Redirecionando...', 'success');
+                
+                clearForm(tipo);
+                
+                setTimeout(() => {
+                    if (isAdmin) {
+                        window.location.href = 'index.html';
+                    } else if (tipo === 'aluno') {
+                        window.location.href = 'aluno.html';
+                    } else if (tipo === 'instrutor') {
+                        window.location.href = 'instrutor.html';
+                    }
+                }, 1000);
+
+            } catch (error) {
+                console.error('Erro ao fazer login:', error);
+                showAlert('Erro ao conectar com o servidor. Verifique se a aplicação está rodando.', 'error');
+            }
+        }
+
+        function showAlert(mensagem, tipo) {
+            const container = document.getElementById('alertContainer');
+            container.innerHTML = `<div class="alert alert-${tipo}">${mensagem}</div>`;
+            
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+
+        document.getElementById('cpfAluno').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 11) {
+                value = value.substring(0, 11);
+            }
+            e.target.value = value;
+        });
+
+        // Formatação automática do CPF no cadastro
+        document.getElementById('cpfAlunoCadastro').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 11) {
+                value = value.substring(0, 11);
+            }
+            
+            // Formatar como 000.000.000-00
+            if (value.length > 9) {
+                value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/, '$1.$2.$3-$4');
+            } else if (value.length > 6) {
+                value = value.replace(/(\d{3})(\d{3})(\d{0,3})/, '$1.$2.$3');
+            } else if (value.length > 3) {
+                value = value.replace(/(\d{3})(\d{0,3})/, '$1.$2');
+            }
+            
+            e.target.value = value;
+        });
+
+        // Fechar modal ao clicar fora
+        window.onclick = function(event) {
+            const modalAluno = document.getElementById('modalCadastroAluno');
+            const modalInstrutor = document.getElementById('modalCadastroInstrutor');
+            
+            if (event.target === modalAluno) {
+                closeRegisterModal('aluno');
+            }
+            if (event.target === modalInstrutor) {
+                closeRegisterModal('instrutor');
+            }
+        };
+
+        aplicarParametrosDoLogin();
+    </script>
+</body>
+</html>

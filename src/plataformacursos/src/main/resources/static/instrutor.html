@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Área do Instrutor - Veridia</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1>Área do Instrutor</h1>
+                    <p id="nomeInstrutor">Bem-vindo(a)!</p>
+                </div>
+                <button onclick="logout()" class="btn-outline" title="Sair do sistema">
+                    Sair
+                </button>
+            </div>
+        </header>
+
+        <nav class="menu">
+            <button onclick="showSection('meusDados')" class="nav-btn active">
+                <span></span> Meus Dados
+            </button>
+            <button onclick="showSection('meusCursos')" class="nav-btn">
+                <span></span> Meus Cursos
+            </button>
+            <button onclick="showSection('gerenciarCursos')" class="nav-btn">
+                <span></span> Criar Curso
+            </button>
+            <button onclick="showSection('alunosInscritos')" class="nav-btn">
+                <span></span> Alunos Inscritos
+            </button>
+        </nav>
+
+        <!-- MEUS DADOS -->
+        <section id="meusDados" class="content-section active">
+            <h2>Meus Dados</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3 id="totalCursosInstrutor">0</h3>
+                    <p>Total de Cursos</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="cursosAtivosInstrutor">0</h3>
+                    <p>Cursos Ativos</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="totalAlunosInstrutor">0</h3>
+                    <p>Total de Alunos</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="receitaTotalInstrutor">R$ 0</h3>
+                    <p>Receita Total</p>
+                </div>
+            </div>
+
+            <div class="info-section" style="margin-top: 2rem;">
+                <h3>Informações Pessoais</h3>
+                <div id="dadosInstrutor"></div>
+            </div>
+        </section>
+
+        <!-- MEUS CURSOS -->
+        <section id="meusCursos" class="content-section">
+            <h2>Meus Cursos</h2>
+            
+            <div class="actions">
+                <button onclick="carregarMeusCursos()" class="btn-outline">
+                    <span></span> Atualizar
+                </button>
+            </div>
+
+            <div id="listaMeusCursos" class="data-list"></div>
+        </section>
+
+        <!-- GERENCIAR CURSOS -->
+        <section id="gerenciarCursos" class="content-section">
+            <h2>Criar Novo Curso</h2>
+            
+            <form onsubmit="criarCurso(event)" class="form-container">
+                <div class="form-group">
+                    <label for="cursoNome">Nome do Curso *</label>
+                    <input type="text" id="cursoNome" required placeholder="Ex: Java Completo 2025">
+                </div>
+
+                <div class="form-group">
+                    <label for="cursoDescricao">Descrição</label>
+                    <textarea id="cursoDescricao" rows="4" placeholder="Descreva o conteúdo do curso..."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="cursoPreco">Preço (R$) *</label>
+                        <input type="number" id="cursoPreco" step="0.01" min="0" required placeholder="599.90">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cursoCargaHoraria">Carga Horária (horas) *</label>
+                        <input type="number" id="cursoCargaHoraria" min="1" required placeholder="80">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cursoVagas">Limite de Vagas *</label>
+                        <input type="number" id="cursoVagas" min="1" required placeholder="50" value="50">
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">
+                        Criar Curso
+                    </button>
+                    <button type="reset" class="btn-outline">
+                        Limpar
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- ALUNOS INSCRITOS -->
+        <section id="alunosInscritos" class="content-section">
+            <h2>Alunos Inscritos nos Meus Cursos</h2>
+            
+            <div class="actions">
+                <button onclick="carregarAlunosInscritos()" class="btn-outline">
+                    <span></span> Atualizar
+                </button>
+            </div>
+
+            <div id="listaAlunosInscritos" class="data-list"></div>
+        </section>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        let session = null;
+        let instrutorLogado = null;
+
+        
+        window.addEventListener('load', async () => {
+            const sessionData = localStorage.getItem('session');
+            if (!sessionData) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            session = JSON.parse(sessionData);
+            if (session.tipo !== 'instrutor') {
+                alert('Acesso negado! Esta área é exclusiva para instrutores.');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            instrutorLogado = session.usuario;
+            document.getElementById('nomeInstrutor').textContent = `Bem-vindo(a), ${instrutorLogado.nome}!`;
+            
+            await carregarDadosInstrutor();
+            await carregarMeusCursos();
+        });
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(sectionId).classList.add('active');
+            event.target.classList.add('active');
+
+            
+            if (sectionId === 'meusCursos') carregarMeusCursos();
+            if (sectionId === 'alunosInscritos') carregarAlunosInscritos();
+            if (sectionId === 'meusDados') carregarDadosInstrutor();
+        }
+
+        async function carregarDadosInstrutor() {
+            try {
+                
+                const cursosResp = await fetch(`${API_URL}/cursos`);
+                const todosCursos = await cursosResp.json();
+                const meusCursos = todosCursos.filter(c => c.instrutor && c.instrutor.id === instrutorLogado.id);
+
+                
+                const inscricoesResp = await fetch(`${API_URL}/inscricoes`);
+                const todasInscricoes = await inscricoesResp.json();
+                
+                
+                const pagamentosResp = await fetch(`${API_URL}/teste/pagamentos`);
+                const todosPagamentos = await pagamentosResp.json();
+                
+                let totalAlunos = 0;
+                let receitaTotal = 0;
+
+                // Garantir que todasInscricoes e todosPagamentos são arrays
+                const inscricoesArray = Array.isArray(todasInscricoes) ? todasInscricoes : [];
+                const pagamentosArray = Array.isArray(todosPagamentos) ? todosPagamentos : [];
+
+                for (const curso of meusCursos) {
+                    const inscricoesCurso = inscricoesArray.filter(i => {
+                        const cursoId = typeof i.curso === 'object' ? i.curso.id : i.curso;
+                        return cursoId === curso.id && i.status !== 'CANCELADA';
+                    });
+                    totalAlunos += inscricoesCurso.length;
+                    
+                    
+                    for (const inscricao of inscricoesCurso) {
+                        const inscricaoId = typeof inscricao === 'object' ? inscricao.id : inscricao;
+                        const pagamento = pagamentosArray.find(p => {
+                            const pagInscricaoId = typeof p.inscricao === 'object' ? p.inscricao.id : p.inscricao;
+                            return pagInscricaoId === inscricaoId;
+                        });
+                        if (pagamento && pagamento.status === 'CONFIRMADO') {
+                            receitaTotal += pagamento.valor;
+                        }
+                    }
+                }
+
+                const cursosAtivos = meusCursos.filter(c => c.ativo).length;
+
+                
+                document.getElementById('totalCursosInstrutor').textContent = meusCursos.length;
+                document.getElementById('cursosAtivosInstrutor').textContent = cursosAtivos;
+                document.getElementById('totalAlunosInstrutor').textContent = totalAlunos;
+                document.getElementById('receitaTotalInstrutor').textContent = `R$ ${receitaTotal.toFixed(2)}`;
+
+                
+                const dadosDiv = document.getElementById('dadosInstrutor');
+                dadosDiv.innerHTML = `
+                    <p><strong>Nome:</strong> ${instrutorLogado.nome}</p>
+                    <p><strong>Email:</strong> ${instrutorLogado.email}</p>
+                    <p><strong>Especialidade:</strong> ${instrutorLogado.especialidade || 'Não informada'}</p>
+                    <p><strong>Total de Cursos:</strong> ${meusCursos.length}</p>
+                    <p><strong>Cursos Ativos:</strong> ${cursosAtivos}</p>
+                `;
+
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
+                showAlert('Erro ao carregar dados do instrutor', 'error');
+            }
+        }
+
+        async function carregarMeusCursos() {
+            try {
+                const response = await fetch(`${API_URL}/cursos`);
+                const todosCursos = await response.json();
+                const meusCursos = todosCursos.filter(c => c.instrutor && c.instrutor.id === instrutorLogado.id);
+
+                const lista = document.getElementById('listaMeusCursos');
+                lista.innerHTML = '';
+
+                if (meusCursos.length === 0) {
+                    lista.innerHTML = `
+                        <div class="empty-state">
+                            <h3>Você ainda não criou nenhum curso</h3>
+                            <p>Clique em "Criar Curso" para começar!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const detalhesPromises = meusCursos.map(curso => 
+                    fetch(`${API_URL}/teste/curso/${curso.id}/detalhes`).then(r => r.json())
+                );
+                const todosDetalhes = await Promise.all(detalhesPromises);
+
+                meusCursos.forEach((curso, index) => {
+                    const detalhes = todosDetalhes[index];
+
+                    const div = document.createElement('div');
+                    div.className = 'data-item';
+                    div.innerHTML = `
+                        <h4>${curso.nome}</h4>
+                        <p>${curso.descricao || 'Sem descrição'}</p>
+                        <p><strong>Preço:</strong> R$ ${curso.preco.toFixed(2)}</p>
+                        <p><strong>Carga Horária:</strong> ${curso.cargaHoraria}h</p>
+                        <p><strong>Alunos Inscritos:</strong> ${detalhes.numeroInscritos || 0}/${curso.limiteVagas || 'Ilimitado'}</p>
+                        <p><strong>Status:</strong> 
+                            <span class="badge ${curso.ativo ? 'badge-success' : 'badge-danger'}">
+                                ${curso.ativo ? 'Ativo' : 'Inativo'}
+                            </span>
+                        </p>
+                        <div class="item-actions">
+                            <button onclick="verAlunosCurso(${curso.id})" class="btn-primary">
+                                Ver Alunos (${detalhes.numeroInscritos || 0})
+                            </button>
+                            <button onclick="toggleStatusCurso(${curso.id}, ${curso.ativo})" class="btn-outline">
+                                ${curso.ativo ? 'Desativar' : 'Ativar'}
+                            </button>
+                        </div>
+                    `;
+                    lista.appendChild(div);
+                });
+
+            } catch (error) {
+                console.error('Erro ao carregar cursos:', error);
+                showAlert('Erro ao carregar seus cursos', 'error');
+            }
+        }
+
+        async function carregarAlunosInscritos() {
+            try {
+                const cursosResp = await fetch(`${API_URL}/cursos`);
+                const todosCursos = await cursosResp.json();
+                const meusCursos = todosCursos.filter(c => c.instrutor && c.instrutor.id === instrutorLogado.id);
+
+                const inscricoesResp = await fetch(`${API_URL}/teste/inscricoes`);
+                const todasInscricoes = await inscricoesResp.json();
+
+                const lista = document.getElementById('listaAlunosInscritos');
+                lista.innerHTML = '';
+
+                let totalInscricoes = 0;
+
+                for (const curso of meusCursos) {
+                    const inscricoesCurso = todasInscricoes.filter(i => {
+                        const cursoId = typeof i.curso === 'object' ? i.curso.id : i.curso;
+                        return cursoId === curso.id;
+                    });
+                    
+                    if (inscricoesCurso.length > 0) {
+                        const cursoDiv = document.createElement('div');
+                        cursoDiv.innerHTML = `<h3 style="margin-top: 2rem; color: var(--primary-color);">${curso.nome} (${inscricoesCurso.length} alunos)</h3>`;
+                        lista.appendChild(cursoDiv);
+
+                        const inscricoesComAlunosPromises = inscricoesCurso.map(async inscricao => {
+                            const alunoId = typeof inscricao.aluno === 'object' ? inscricao.aluno.id : inscricao.aluno;
+                            const alunoResp = await fetch(`${API_URL}/alunos/${alunoId}`);
+                            const aluno = await alunoResp.json();
+                            return { ...inscricao, alunoCompleto: aluno };
+                        });
+
+                        const inscricoesComAlunos = await Promise.all(inscricoesComAlunosPromises);
+
+                        inscricoesComAlunos.forEach(inscricao => {
+                            const statusClass = 
+                                inscricao.status === 'PAGO' || inscricao.status === 'CONFIRMADA' ? 'badge-success' :
+                                inscricao.status === 'PENDENTE' ? 'badge-warning' :
+                                inscricao.status === 'CONCLUIDA' ? 'badge-success' :
+                                'badge-danger';
+
+                            const div = document.createElement('div');
+                            div.className = 'data-item';
+                            div.innerHTML = `
+                                <h4>${inscricao.alunoCompleto.nome}</h4>
+                                <p><strong>Email:</strong> ${inscricao.alunoCompleto.email}</p>
+                                <p><strong>Data de Inscrição:</strong> ${new Date(inscricao.dataInscricao).toLocaleString('pt-BR')}</p>
+                                <p><strong>Status:</strong> 
+                                    <span class="badge ${statusClass}">${inscricao.status}</span>
+                                </p>
+                                ${inscricao.status === 'CONFIRMADA' || inscricao.status === 'PAGO' ? `
+                                    <div class="item-actions">
+                                        <button onclick="concluirInscricao(${inscricao.id})" class="btn-primary">
+                                            Marcar como Concluída
+                                        </button>
+                                    </div>
+                                ` : ''}
+                            `;
+                            lista.appendChild(div);
+                            totalInscricoes++;
+                        });
+                    }
+                }
+
+                if (totalInscricoes === 0) {
+                    lista.innerHTML = `
+                        <div class="empty-state">
+                            
+                            <h3>Nenhum aluno inscrito ainda</h3>
+                            <p>Quando alunos se inscreverem em seus cursos, eles aparecerão aqui.</p>
+                        </div>
+                    `;
+                }
+
+            } catch (error) {
+                console.error('Erro ao carregar alunos:', error);
+                showAlert('Erro ao carregar alunos inscritos', 'error');
+            }
+        }
+
+        async function criarCurso(event) {
+            event.preventDefault();
+
+            const curso = {
+                nome: document.getElementById('cursoNome').value,
+                descricao: document.getElementById('cursoDescricao').value,
+                preco: parseFloat(document.getElementById('cursoPreco').value),
+                cargaHoraria: parseInt(document.getElementById('cursoCargaHoraria').value),
+                limiteVagas: parseInt(document.getElementById('cursoVagas').value),
+                ativo: true,
+                instrutor: { id: instrutorLogado.id }
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/cursos`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(curso)
+                });
+
+                if (response.ok) {
+                    showAlert('Curso criado com sucesso!', 'success');
+                    event.target.reset();
+                    carregarDadosInstrutor();
+                    carregarMeusCursos();
+                } else {
+                    const error = await response.json();
+                    showAlert(error.mensagem || 'Erro ao criar curso', 'error');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showAlert('Erro ao criar curso', 'error');
+            }
+        }
+
+        async function verAlunosCurso(cursoId) {
+            try {
+                const response = await fetch(`${API_URL}/teste/inscricoes`);
+                const todasInscricoes = await response.json();
+                
+                const inscricoesCurso = todasInscricoes.filter(i => {
+                    const inscricaoCursoId = typeof i.curso === 'object' ? i.curso.id : i.curso;
+                    return inscricaoCursoId === cursoId && i.status !== 'CANCELADA';
+                });
+
+                const cursoResp = await fetch(`${API_URL}/cursos/${cursoId}`);
+                const curso = await cursoResp.json();
+
+                const alunosPromises = inscricoesCurso.map(async inscricao => {
+                    const alunoId = typeof inscricao.aluno === 'object' ? inscricao.aluno.id : inscricao.aluno;
+                    const alunoResp = await fetch(`${API_URL}/alunos/${alunoId}`);
+                    const aluno = await alunoResp.json();
+                    return {
+                        aluno: aluno,
+                        status: inscricao.status,
+                        dataInscricao: inscricao.dataInscricao
+                    };
+                });
+
+                const alunos = await Promise.all(alunosPromises);
+
+                let html = `<h3>Alunos Inscritos - ${curso.nome}</h3>`;
+                
+                if (alunos.length === 0) {
+                    html += '<div class="empty-state"><div class="empty-state-icon"></div><p>Nenhum aluno inscrito neste curso.</p></div>';
+                } else {
+                    html += `<p style="margin-bottom: 1rem;"><strong>Total de alunos:</strong> ${alunos.length}</p>`;
+                    alunos.forEach(({aluno, status, dataInscricao}) => {
+                        const statusBadge = status === 'PAGO' ? 'success' : status === 'CONCLUIDA' ? 'info' : 'warning';
+                        const dataFormatada = dataInscricao ? new Date(dataInscricao).toLocaleDateString('pt-BR') : 'N/A';
+                        html += `
+                            <div class="data-item" style="margin-bottom: 0.5rem;">
+                                <p><strong>Nome:</strong> ${aluno.nome}</p>
+                                <p><strong>Email:</strong> ${aluno.email}</p>
+                                <p><strong>Data de Inscrição:</strong> ${dataFormatada}</p>
+                                <p><strong>Status:</strong> <span class="badge badge-${statusBadge}">${status}</span></p>
+                            </div>
+                        `;
+                    });
+                }
+
+                mostrarModal('Alunos do Curso', html);
+            } catch (error) {
+                console.error('Erro ao carregar alunos:', error);
+                showAlert('Erro ao carregar alunos do curso', 'error');
+            }
+        }
+
+        async function toggleStatusCurso(cursoId, ativo) {
+            const acao = ativo ? 'desativar' : 'ativar';
+            if (!confirm(`Deseja realmente ${acao} este curso?`)) return;
+
+            try {
+                
+                const getResp = await fetch(`${API_URL}/cursos/${cursoId}`);
+                const curso = await getResp.json();
+                curso.ativo = !ativo;
+
+                const response = await fetch(`${API_URL}/cursos/${cursoId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(curso)
+                });
+
+                if (response.ok) {
+                    showAlert(`Curso ${acao}do com sucesso!`, 'success');
+                    carregarMeusCursos();
+                } else {
+                    showAlert(`Erro ao ${acao} curso`, 'error');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showAlert(`Erro ao ${acao} curso`, 'error');
+            }
+        }
+
+        async function concluirInscricao(inscricaoId) {
+            if (!confirm('Confirmar que o aluno concluiu o curso?')) return;
+
+            try {
+                const getResp = await fetch(`${API_URL}/inscricoes/${inscricaoId}`);
+                const inscricao = await getResp.json();
+
+                const response = await fetch(
+                    `${API_URL}/alunos/${inscricao.aluno.id}/inscricoes/${inscricaoId}/concluir`,
+                    { method: 'POST' }
+                );
+
+                if (response.ok) {
+                    showAlert('Inscrição marcada como concluída!', 'success');
+                    carregarAlunosInscritos();
+                } else {
+                    const error = await response.json();
+                    showAlert(error.mensagem || 'Erro ao concluir inscrição', 'error');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showAlert('Erro ao concluir inscrição', 'error');
+            }
+        }
+
+        function logout() {
+            if (confirm('Deseja realmente sair?')) {
+                localStorage.removeItem('session');
+                window.location.href = 'login.html';
+            }
+        }
+
+        function voltarLogin() {
+            if (confirm('Deseja voltar para a tela de login? Você será desconectado.')) {
+                localStorage.removeItem('session');
+                window.location.href = 'login.html';
+            }
+        }
+    </script>
+
+    <style>
+        .form-container {
+            max-width: 800px;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+    </style>
+</body>
+</html>
