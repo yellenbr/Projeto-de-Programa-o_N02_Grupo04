@@ -36,7 +36,7 @@ public class Pagamento {
         CANCELADO
     }
 
-    // Getters and Setters
+    
     public Long getId() {
         return id;
     }

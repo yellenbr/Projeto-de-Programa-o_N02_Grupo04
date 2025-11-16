@@ -1,9 +1,12 @@
 package com.veridia.gestao.plataformacursos.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import java.util.List;
 
 @Entity
 public class Instrutor {
@@ -17,6 +20,10 @@ public class Instrutor {
     private String senha;
     private String especialidade;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "instrutor")
+    private List<Curso> cursos;
+
     public Instrutor() {}
 
     public Instrutor(String nome, String email, String cpf, String senha, String especialidade) {
@@ -27,7 +34,7 @@ public class Instrutor {
         this.especialidade = especialidade;
     }
 
-    // Getters and Setters
+   
     public Long getId() {
         return id;
     }
@@ -74,5 +81,13 @@ public class Instrutor {
 
     public void setEspecialidade(String especialidade) {
         this.especialidade = especialidade;
+    }
+
+    public List<Curso> getCursos() {
+        return cursos;
+    }
+
+    public void setCursos(List<Curso> cursos) {
+        this.cursos = cursos;
     }
 }

@@ -159,7 +159,6 @@
                 const response = await fetch(`${API_URL}/teste/aluno/${alunoLogado.id}/detalhes`);
                 const data = await response.json();
 
-                // Estatísticas do Dashboard
                 const totalInscricoes = data.inscricoes?.length || 0;
                 const cursosAtivos = data.numeroCursosAtivos || 0;
                 const pendentes = data.cursosPendentes || 0;
@@ -170,7 +169,6 @@
                 document.getElementById('cursosPendentesAluno').textContent = pendentes;
                 document.getElementById('cursosConcluidosAluno').textContent = concluidos;
 
-                // Informações Pessoais
                 const dadosDiv = document.getElementById('dadosAluno');
                 dadosDiv.innerHTML = `
                     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
@@ -191,7 +189,6 @@
                     </div>
                 `;
 
-                // Lista de Cursos Inscritos
                 const listaCursosInscritos = document.getElementById('listaCursosInscritos');
                 if (data.inscricoes && data.inscricoes.length > 0) {
                     listaCursosInscritos.innerHTML = '';
@@ -405,7 +402,6 @@
                     return;
                 }
 
-                // Agrupar por status
                 const pendentes = [];
                 const ativos = [];
                 const concluidos = [];
@@ -428,7 +424,6 @@
                     }
                 }
 
-                // Função auxiliar para criar item de inscrição
                 async function criarItemInscricao(inscricao, titulo) {
                     try {
                         const cursoId = typeof inscricao.curso === 'object' ? inscricao.curso.id : inscricao.curso;
@@ -488,7 +483,6 @@
                     }
                 }
 
-                // Adicionar seções
                 if (pendentes.length > 0) {
                     const h3 = document.createElement('h3');
                     h3.textContent = 'Aguardando Pagamento (' + pendentes.length + ')';
@@ -627,7 +621,6 @@
                     }
                 }
 
-                // Adicionar resumo no topo
                 if (totalPago > 0) {
                     const resumo = document.createElement('div');
                     resumo.className = 'data-item';

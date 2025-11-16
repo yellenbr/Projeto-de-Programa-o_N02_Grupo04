@@ -1,5 +1,7 @@
 package com.veridia.gestao.plataformacursos.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,14 +25,16 @@ public class Curso {
     private boolean ativo;
     private int vagasDisponiveis;
 
+    @JsonIgnoreProperties({"cursos"})
     @ManyToOne
     @JoinColumn(name = "instrutor_id")
     private Instrutor instrutor;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "curso")
     private List<Inscricao> inscricoes;
 
-    // Getters and Setters
+    
     public Long getId() {
         return id;
     }

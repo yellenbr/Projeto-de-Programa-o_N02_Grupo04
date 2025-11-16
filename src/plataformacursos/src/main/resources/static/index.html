@@ -6,7 +6,6 @@
     <title>Veridia - Plataforma de Cursos</title>
     <link rel="stylesheet" href="css/style.css">
     <script>
-        // Redireciona para a página de login se não houver sessão
         if (!localStorage.getItem('session')) {
             window.location.href = 'login.html';
         }
@@ -90,6 +89,21 @@
         <section id="alunos" class="content-section">
             <h2>Gerenciar Alunos</h2>
             
+            <div class="stats-grid" style="margin-bottom: 2rem;">
+                <div class="stat-card">
+                    <h3 id="totalAlunosCard">0</h3>
+                    <p>Total de Alunos</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="alunosAtivos">0</h3>
+                    <p>Ativos</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="alunosNovos">0</h3>
+                    <p>Novos este mês</p>
+                </div>
+            </div>
+            
             <div class="actions">
                 <button onclick="showModalAluno()" class="btn-primary">
                     <span></span> Novo Aluno
@@ -104,21 +118,6 @@
                     <div class="empty-state-icon"></div>
                     <h3>Nenhum aluno cadastrado</h3>
                     <p>Clique no botão "Novo Aluno" acima para começar a adicionar alunos à plataforma.</p>
-                </div>
-            </div>
-
-            <div class="stats-grid" style="margin-top: 2rem;">
-                <div class="stat-card">
-                    <h3 id="totalAlunosCard">0</h3>
-                    <p>Total de Alunos</p>
-                </div>
-                <div class="stat-card">
-                    <h3 id="alunosAtivos">0</h3>
-                    <p>Ativos</p>
-                </div>
-                <div class="stat-card">
-                    <h3 id="alunosNovos">0</h3>
-                    <p>Novos este mês</p>
                 </div>
             </div>
         </section>

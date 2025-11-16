@@ -45,10 +45,6 @@
                     <p>Total de Cursos</p>
                 </div>
                 <div class="stat-card">
-                    <h3 id="cursosAtivosInstrutor">0</h3>
-                    <p>Cursos Ativos</p>
-                </div>
-                <div class="stat-card">
                     <h3 id="totalAlunosInstrutor">0</h3>
                     <p>Total de Alunos</p>
                 </div>
@@ -180,62 +176,21 @@
 
         async function carregarDadosInstrutor() {
             try {
-                
-                const cursosResp = await fetch(`${API_URL}/cursos`);
-                const todosCursos = await cursosResp.json();
-                const meusCursos = todosCursos.filter(c => c.instrutor && c.instrutor.id === instrutorLogado.id);
+                const dashboardResp = await fetch(`${API_URL}/instrutores/${instrutorLogado.id}/dashboard`);
+                const dashboard = await dashboardResp.json();
 
-                
-                const inscricoesResp = await fetch(`${API_URL}/inscricoes`);
-                const todasInscricoes = await inscricoesResp.json();
-                
-                
-                const pagamentosResp = await fetch(`${API_URL}/teste/pagamentos`);
-                const todosPagamentos = await pagamentosResp.json();
-                
-                let totalAlunos = 0;
-                let receitaTotal = 0;
+                document.getElementById('totalCursosInstrutor').textContent = dashboard.totalCursos || 0;
+                document.getElementById('totalAlunosInstrutor').textContent = dashboard.totalAlunos || 0;
+                document.getElementById('receitaTotalInstrutor').textContent = `R$ ${(dashboard.receitaTotal || 0).toFixed(2)}`;
 
-                // Garantir que todasInscricoes e todosPagamentos são arrays
-                const inscricoesArray = Array.isArray(todasInscricoes) ? todasInscricoes : [];
-                const pagamentosArray = Array.isArray(todosPagamentos) ? todosPagamentos : [];
-
-                for (const curso of meusCursos) {
-                    const inscricoesCurso = inscricoesArray.filter(i => {
-                        const cursoId = typeof i.curso === 'object' ? i.curso.id : i.curso;
-                        return cursoId === curso.id && i.status !== 'CANCELADA';
-                    });
-                    totalAlunos += inscricoesCurso.length;
-                    
-                    
-                    for (const inscricao of inscricoesCurso) {
-                        const inscricaoId = typeof inscricao === 'object' ? inscricao.id : inscricao;
-                        const pagamento = pagamentosArray.find(p => {
-                            const pagInscricaoId = typeof p.inscricao === 'object' ? p.inscricao.id : p.inscricao;
-                            return pagInscricaoId === inscricaoId;
-                        });
-                        if (pagamento && pagamento.status === 'CONFIRMADO') {
-                            receitaTotal += pagamento.valor;
-                        }
-                    }
-                }
-
-                const cursosAtivos = meusCursos.filter(c => c.ativo).length;
-
-                
-                document.getElementById('totalCursosInstrutor').textContent = meusCursos.length;
-                document.getElementById('cursosAtivosInstrutor').textContent = cursosAtivos;
-                document.getElementById('totalAlunosInstrutor').textContent = totalAlunos;
-                document.getElementById('receitaTotalInstrutor').textContent = `R$ ${receitaTotal.toFixed(2)}`;
-
-                
                 const dadosDiv = document.getElementById('dadosInstrutor');
                 dadosDiv.innerHTML = `
                     <p><strong>Nome:</strong> ${instrutorLogado.nome}</p>
                     <p><strong>Email:</strong> ${instrutorLogado.email}</p>
                     <p><strong>Especialidade:</strong> ${instrutorLogado.especialidade || 'Não informada'}</p>
-                    <p><strong>Total de Cursos:</strong> ${meusCursos.length}</p>
-                    <p><strong>Cursos Ativos:</strong> ${cursosAtivos}</p>
+                    <p><strong>Total de Cursos:</strong> ${dashboard.totalCursos || 0}</p>
+                    <p><strong>Total de Alunos:</strong> ${dashboard.totalAlunos || 0}</p>
+                    <p><strong>Receita Total:</strong> R$ ${(dashboard.receitaTotal || 0).toFixed(2)}</p>
                 `;
 
             } catch (error) {
@@ -246,14 +201,13 @@
 
         async function carregarMeusCursos() {
             try {
-                const response = await fetch(`${API_URL}/cursos`);
-                const todosCursos = await response.json();
-                const meusCursos = todosCursos.filter(c => c.instrutor && c.instrutor.id === instrutorLogado.id);
+                const response = await fetch(`${API_URL}/instrutores/${instrutorLogado.id}/cursos`);
+                const cursosDTO = await response.json();
 
                 const lista = document.getElementById('listaMeusCursos');
                 lista.innerHTML = '';
 
-                if (meusCursos.length === 0) {
+                if (cursosDTO.length === 0) {
                     lista.innerHTML = `
                         <div class="empty-state">
                             <h3>Você ainda não criou nenhum curso</h3>
@@ -263,38 +217,34 @@
                     return;
                 }
 
-                const detalhesPromises = meusCursos.map(curso => 
-                    fetch(`${API_URL}/teste/curso/${curso.id}/detalhes`).then(r => r.json())
-                );
-                const todosDetalhes = await Promise.all(detalhesPromises);
-
-                meusCursos.forEach((curso, index) => {
-                    const detalhes = todosDetalhes[index];
+                for (const cursoDTO of cursosDTO) {
+                    const cursoResp = await fetch(`${API_URL}/cursos/${cursoDTO.cursoId}`);
+                    const curso = await cursoResp.json();
 
                     const div = document.createElement('div');
                     div.className = 'data-item';
                     div.innerHTML = `
-                        <h4>${curso.nome}</h4>
+                        <h4>${cursoDTO.cursoNome}</h4>
                         <p>${curso.descricao || 'Sem descrição'}</p>
-                        <p><strong>Preço:</strong> R$ ${curso.preco.toFixed(2)}</p>
+                        <p><strong>Preço:</strong> R$ ${cursoDTO.cursoPreco.toFixed(2)}</p>
                         <p><strong>Carga Horária:</strong> ${curso.cargaHoraria}h</p>
-                        <p><strong>Alunos Inscritos:</strong> ${detalhes.numeroInscritos || 0}/${curso.limiteVagas || 'Ilimitado'}</p>
+                        <p><strong>Alunos Inscritos:</strong> ${cursoDTO.totalAlunos}/${curso.limiteVagas || 'Ilimitado'}</p>
                         <p><strong>Status:</strong> 
                             <span class="badge ${curso.ativo ? 'badge-success' : 'badge-danger'}">
                                 ${curso.ativo ? 'Ativo' : 'Inativo'}
                             </span>
                         </p>
                         <div class="item-actions">
-                            <button onclick="verAlunosCurso(${curso.id})" class="btn-primary">
-                                Ver Alunos (${detalhes.numeroInscritos || 0})
+                            <button onclick="verAlunosCurso(${cursoDTO.cursoId})" class="btn-primary">
+                                Ver Alunos (${cursoDTO.totalAlunos})
                             </button>
-                            <button onclick="toggleStatusCurso(${curso.id}, ${curso.ativo})" class="btn-outline">
+                            <button onclick="toggleStatusCurso(${cursoDTO.cursoId}, ${curso.ativo})" class="btn-outline">
                                 ${curso.ativo ? 'Desativar' : 'Ativar'}
                             </button>
                         </div>
                     `;
                     lista.appendChild(div);
-                });
+                }
 
             } catch (error) {
                 console.error('Erro ao carregar cursos:', error);
@@ -304,74 +254,54 @@
 
         async function carregarAlunosInscritos() {
             try {
-                const cursosResp = await fetch(`${API_URL}/cursos`);
-                const todosCursos = await cursosResp.json();
-                const meusCursos = todosCursos.filter(c => c.instrutor && c.instrutor.id === instrutorLogado.id);
-
-                const inscricoesResp = await fetch(`${API_URL}/teste/inscricoes`);
-                const todasInscricoes = await inscricoesResp.json();
+                const cursosResp = await fetch(`${API_URL}/instrutores/${instrutorLogado.id}/cursos`);
+                const cursosDTO = await cursosResp.json();
 
                 const lista = document.getElementById('listaAlunosInscritos');
                 lista.innerHTML = '';
 
-                let totalInscricoes = 0;
+                let totalAlunosGeral = 0;
+                for (const cursoDTO of cursosDTO) {
+                    if (cursoDTO.totalAlunos === 0) continue;
 
-                for (const curso of meusCursos) {
-                    const inscricoesCurso = todasInscricoes.filter(i => {
-                        const cursoId = typeof i.curso === 'object' ? i.curso.id : i.curso;
-                        return cursoId === curso.id;
+                    const alunosResp = await fetch(`${API_URL}/instrutores/${instrutorLogado.id}/cursos/${cursoDTO.cursoId}/alunos`);
+                    const alunos = await alunosResp.json();
+
+                    totalAlunosGeral += alunos.length;
+
+                    const cursoSection = document.createElement('div');
+                    cursoSection.style.marginBottom = '2rem';
+                    cursoSection.innerHTML = `
+                        <h4 style="margin-bottom: 1rem; color: var(--primary-color);">
+                            ${cursoDTO.cursoNome} (${alunos.length} alunos)
+                        </h4>
+                    `;
+
+                    alunos.forEach(aluno => {
+                        const div = document.createElement('div');
+                        div.className = 'data-item';
+                        div.innerHTML = `
+                            <h5>${aluno.nome}</h5>
+                            <p><strong>Email:</strong> ${aluno.email}</p>
+                            <p><strong>CPF:</strong> ${formatarCPF(aluno.cpf)}</p>
+                            <p><strong>Status:</strong> 
+                                <span class="badge ${aluno.status === 'ATIVA' ? 'badge-success' : 'badge-warning'}">
+                                    ${aluno.status}
+                                </span>
+                            </p>
+                            <p><strong>Data de Inscrição:</strong> ${new Date(aluno.dataInscricao).toLocaleDateString('pt-BR')}</p>
+                        `;
+                        cursoSection.appendChild(div);
                     });
-                    
-                    if (inscricoesCurso.length > 0) {
-                        const cursoDiv = document.createElement('div');
-                        cursoDiv.innerHTML = `<h3 style="margin-top: 2rem; color: var(--primary-color);">${curso.nome} (${inscricoesCurso.length} alunos)</h3>`;
-                        lista.appendChild(cursoDiv);
 
-                        const inscricoesComAlunosPromises = inscricoesCurso.map(async inscricao => {
-                            const alunoId = typeof inscricao.aluno === 'object' ? inscricao.aluno.id : inscricao.aluno;
-                            const alunoResp = await fetch(`${API_URL}/alunos/${alunoId}`);
-                            const aluno = await alunoResp.json();
-                            return { ...inscricao, alunoCompleto: aluno };
-                        });
-
-                        const inscricoesComAlunos = await Promise.all(inscricoesComAlunosPromises);
-
-                        inscricoesComAlunos.forEach(inscricao => {
-                            const statusClass = 
-                                inscricao.status === 'PAGO' || inscricao.status === 'CONFIRMADA' ? 'badge-success' :
-                                inscricao.status === 'PENDENTE' ? 'badge-warning' :
-                                inscricao.status === 'CONCLUIDA' ? 'badge-success' :
-                                'badge-danger';
-
-                            const div = document.createElement('div');
-                            div.className = 'data-item';
-                            div.innerHTML = `
-                                <h4>${inscricao.alunoCompleto.nome}</h4>
-                                <p><strong>Email:</strong> ${inscricao.alunoCompleto.email}</p>
-                                <p><strong>Data de Inscrição:</strong> ${new Date(inscricao.dataInscricao).toLocaleString('pt-BR')}</p>
-                                <p><strong>Status:</strong> 
-                                    <span class="badge ${statusClass}">${inscricao.status}</span>
-                                </p>
-                                ${inscricao.status === 'CONFIRMADA' || inscricao.status === 'PAGO' ? `
-                                    <div class="item-actions">
-                                        <button onclick="concluirInscricao(${inscricao.id})" class="btn-primary">
-                                            Marcar como Concluída
-                                        </button>
-                                    </div>
-                                ` : ''}
-                            `;
-                            lista.appendChild(div);
-                            totalInscricoes++;
-                        });
-                    }
+                    lista.appendChild(cursoSection);
                 }
 
-                if (totalInscricoes === 0) {
+                if (totalAlunosGeral === 0) {
                     lista.innerHTML = `
                         <div class="empty-state">
-                            
                             <h3>Nenhum aluno inscrito ainda</h3>
-                            <p>Quando alunos se inscreverem em seus cursos, eles aparecerão aqui.</p>
+                            <p>Seus cursos ainda não têm inscrições.</p>
                         </div>
                     `;
                 }

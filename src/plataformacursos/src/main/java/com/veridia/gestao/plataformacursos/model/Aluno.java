@@ -1,5 +1,6 @@
 package com.veridia.gestao.plataformacursos.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -24,6 +25,7 @@ public class Aluno {
     @Column(nullable = false, unique = true, length = 11)
     private String cpf;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "aluno", cascade = CascadeType.ALL)
     private List<Inscricao> inscricoes;
 
@@ -83,7 +85,7 @@ public class Aluno {
         if (!curso.temVagasDisponiveis()) {
             return false;
         }
-        // Verifica se o aluno já está inscrito e com status pendente
+        
         return inscricoes.stream()
                 .filter(i -> i.getCurso().equals(curso))
                 .noneMatch(i -> i.getStatus() == Inscricao.StatusInscricao.PENDENTE);

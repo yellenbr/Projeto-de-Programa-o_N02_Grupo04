@@ -473,7 +473,6 @@
 
     <script src="js/app.js"></script>
     <script>
-        // Limpa a sessão anterior ao carregar a página de login para garantir um novo login.
         localStorage.removeItem('session');
 
         function togglePassword(inputId) {
@@ -589,7 +588,6 @@
             }
 
             try {
-                // Verificar se o email já existe
                 const responseCheck = await fetch(`${API_URL}/alunos`);
                 const alunos = await responseCheck.json();
                 
@@ -659,7 +657,6 @@
             }
 
             try {
-                // Verificar se o email já existe
                 const responseCheck = await fetch(`${API_URL}/instrutores`);
                 const instrutores = await responseCheck.json();
                 
@@ -701,7 +698,6 @@
                     const email = document.getElementById('emailAluno').value.trim();
                     const cpf = document.getElementById('cpfAluno').value.replace(/\D/g, '');
                     
-                    // Verificar se é admin tentando fazer login
                     if (email === 'admin@veridia.com' && cpf === 'admin123') {
                         isAdmin = true;
                         userData = { id: 0, nome: 'Administrador', email: email, tipo: 'admin' };
@@ -725,7 +721,6 @@
                     const email = document.getElementById('emailInstrutor').value.trim();
                     const senha = document.getElementById('senhaInstrutor').value.trim();
                     
-                    // Verificar se é admin tentando fazer login
                     if (email === 'admin@veridia.com' && senha === 'admin123') {
                         isAdmin = true;
                         userData = { id: 0, nome: 'Administrador', email: email, tipo: 'admin' };
@@ -786,14 +781,12 @@
             e.target.value = value;
         });
 
-        // Formatação automática do CPF no cadastro
         document.getElementById('cpfAlunoCadastro').addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
             if (value.length > 11) {
                 value = value.substring(0, 11);
             }
             
-            // Formatar como 000.000.000-00
             if (value.length > 9) {
                 value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/, '$1.$2.$3-$4');
             } else if (value.length > 6) {
@@ -805,7 +798,6 @@
             e.target.value = value;
         });
 
-        // Fechar modal ao clicar fora
         window.onclick = function(event) {
             const modalAluno = document.getElementById('modalCadastroAluno');
             const modalInstrutor = document.getElementById('modalCadastroInstrutor');

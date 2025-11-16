@@ -1,5 +1,6 @@
 package com.veridia.gestao.plataformacursos.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,10 +18,12 @@ public class Inscricao {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonIgnoreProperties({"inscricoes"})
     @ManyToOne
     @JoinColumn(name = "aluno_id", nullable = false)
     private Aluno aluno;
 
+    @JsonIgnoreProperties({"inscricoes", "instrutor"})
     @ManyToOne
     @JoinColumn(name = "curso_id", nullable = false)
     private Curso curso;
@@ -37,7 +40,7 @@ public class Inscricao {
         PENDENTE
     }
 
-    // Getters and Setters
+   
     public Long getId() {
         return id;
     }

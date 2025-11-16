@@ -149,4 +149,104 @@ public class TesteController {
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/dados")
+    public ResponseEntity<Map<String, Object>> getTodosOsDados() {
+        try {
+            List<Aluno> alunos = alunoRepository.findAll();
+            List<Curso> cursos = cursoRepository.findAll();
+            List<Instrutor> instrutores = instrutorRepository.findAll();
+            List<Inscricao> inscricoes = inscricaoRepository.findAll();
+            List<Pagamento> pagamentos = pagamentoRepository.findAll();
+
+            // Criar listas simplificadas para evitar referências cíclicas
+            List<Map<String, Object>> alunosSimples = alunos.stream()
+                    .map(a -> {
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("id", a.getId());
+                        map.put("nome", a.getNome());
+                        map.put("email", a.getEmail());
+                        map.put("cpf", a.getCpf());
+                        return map;
+                    })
+                    .collect(Collectors.toList());
+
+            List<Map<String, Object>> cursosSimples = cursos.stream()
+                    .map(c -> {
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("id", c.getId());
+                        map.put("nome", c.getNome());
+                        map.put("descricao", c.getDescricao());
+                        map.put("preco", c.getPreco());
+                        map.put("cargaHoraria", c.getCargaHoraria());
+                        map.put("limiteVagas", c.getLimiteVagas());
+                        map.put("ativo", c.getAtivo());
+                        if (c.getInstrutor() != null) {
+                            map.put("instrutorId", c.getInstrutor().getId());
+                            map.put("instrutorNome", c.getInstrutor().getNome());
+                        }
+                        return map;
+                    })
+                    .collect(Collectors.toList());
+
+            List<Map<String, Object>> instrutoresSimples = instrutores.stream()
+                    .map(i -> {
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("id", i.getId());
+                        map.put("nome", i.getNome());
+                        map.put("email", i.getEmail());
+                        map.put("especialidade", i.getEspecialidade());
+                        return map;
+                    })
+                    .collect(Collectors.toList());
+
+            List<Map<String, Object>> inscricoesSimples = inscricoes.stream()
+                    .map(insc -> {
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("id", insc.getId());
+                        map.put("alunoId", insc.getAluno().getId());
+                        map.put("alunoNome", insc.getAluno().getNome());
+                        map.put("cursoId", insc.getCurso().getId());
+                        map.put("cursoNome", insc.getCurso().getNome());
+                        map.put("status", insc.getStatus().toString());
+                        map.put("dataInscricao", insc.getDataInscricao());
+                        return map;
+                    })
+                    .collect(Collectors.toList());
+
+            List<Map<String, Object>> pagamentosSimples = pagamentos.stream()
+                    .map(p -> {
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("id", p.getId());
+                        map.put("inscricaoId", p.getInscricao().getId());
+                        map.put("valor", p.getValor());
+                        map.put("metodoPagamento", p.getMetodoPagamento());
+                        map.put("status", p.getStatus().toString());
+                        map.put("dataPagamento", p.getDataPagamento());
+                        return map;
+                    })
+                    .collect(Collectors.toList());
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("alunos", alunosSimples);
+            response.put("cursos", cursosSimples);
+            response.put("instrutores", instrutoresSimples);
+            response.put("inscricoes", inscricoesSimples);
+            response.put("pagamentos", pagamentosSimples);
+            response.put("totais", Map.of(
+                    "alunos", alunos.size(),
+                    "cursos", cursos.size(),
+                    "instrutores", instrutores.size(),
+                    "inscricoes", inscricoes.size(),
+                    "pagamentos", pagamentos.size()
+            ));
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("erro", "Erro ao carregar dados");
+            error.put("mensagem", e.getMessage());
+            return ResponseEntity.status(500).body(error);
+        }
+    }
 }

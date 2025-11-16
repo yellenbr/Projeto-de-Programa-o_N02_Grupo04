@@ -1,16 +1,12 @@
-// API Base URL
 const API_URL = 'http://localhost:8080/api';
 
-// Função de logout
 function logout() {
-//... (o resto do arquivo permanece o mesmo)
     if (confirm('Deseja realmente sair?')) {
         localStorage.removeItem('session');
         window.location.href = 'login.html';
     }
 }
 
-// Função de voltar ao login (trocar conta)
 function voltarLogin() {
     if (confirm('Deseja voltar para a tela de login? Você será desconectado.')) {
         localStorage.removeItem('session');
@@ -18,25 +14,19 @@ function voltarLogin() {
     }
 }
 
-// Funções de Navegação
 function showSection(sectionId) {
-    // Esconder todas as seções
     document.querySelectorAll('.content-section').forEach(section => {
         section.classList.remove('active');
     });
     
-    // Remover classe active de todos os botões
     document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.classList.remove('active');
     });
     
-    // Mostrar seção selecionada
     document.getElementById(sectionId).classList.add('active');
     
-    // Adicionar classe active ao botão clicado
     event.target.classList.add('active');
     
-    // Carregar dados da seção
     switch(sectionId) {
         case 'dashboard':
             carregarDashboard();
@@ -56,7 +46,7 @@ function showSection(sectionId) {
     }
 }
 
-// Funções de Modal
+
 function showModalAluno() {
     document.getElementById('modalAluno').classList.add('active');
 }
@@ -80,7 +70,6 @@ function closeModal(modalId) {
     document.getElementById(modalId).classList.remove('active');
 }
 
-// Funções de Dashboard
 async function carregarDashboard() {
     try {
         const totalAlunosEl = document.getElementById('totalAlunos');
@@ -98,7 +87,6 @@ async function carregarDashboard() {
     }
 }
 
-// ========== ALUNOS ==========
 async function carregarAlunos() {
     try {
         const response = await fetch(`${API_URL}/alunos`);
@@ -109,27 +97,57 @@ async function carregarAlunos() {
         
         if (alunos.length === 0) {
             listaAlunos.innerHTML = '<p class="alert alert-info">Nenhum aluno cadastrado.</p>';
-            return;
+        } else {
+            alunos.forEach(aluno => {
+                const div = document.createElement('div');
+                div.className = 'data-item';
+                div.innerHTML = `
+                    <h4>${aluno.nome}</h4>
+                    <p><strong>Email:</strong> ${aluno.email}</p>
+                    <p><strong>CPF:</strong> ${formatarCPF(aluno.cpf)}</p>
+                    <p><strong>ID:</strong> ${aluno.id}</p>
+                    <div class="item-actions">
+                        <button onclick="verDetalhesAluno(${aluno.id})" class="btn-primary">Detalhes</button>
+                        <button onclick="deletarAluno(${aluno.id})" class="btn-danger">Excluir</button>
+                    </div>
+                `;
+                listaAlunos.appendChild(div);
+            });
         }
         
-        alunos.forEach(aluno => {
-            const div = document.createElement('div');
-            div.className = 'data-item';
-            div.innerHTML = `
-                <h4>${aluno.nome}</h4>
-                <p><strong>Email:</strong> ${aluno.email}</p>
-                <p><strong>CPF:</strong> ${formatarCPF(aluno.cpf)}</p>
-                <p><strong>ID:</strong> ${aluno.id}</p>
-                <div class="item-actions">
-                    <button onclick="verDetalhesAluno(${aluno.id})" class="btn-primary">Detalhes</button>
-                    <button onclick="deletarAluno(${aluno.id})" class="btn-danger">Excluir</button>
-                </div>
-            `;
-            listaAlunos.appendChild(div);
-        });
+        await atualizarEstatisticasAlunos(alunos);
     } catch (error) {
         console.error('Erro ao carregar alunos:', error);
         showAlert('Erro ao carregar alunos', 'error');
+    }
+}
+
+async function atualizarEstatisticasAlunos(alunos) {
+    try {
+        const totalAlunosCardEl = document.getElementById('totalAlunosCard');
+        const alunosAtivosEl = document.getElementById('alunosAtivos');
+        const alunosNovosEl = document.getElementById('alunosNovos');
+        
+        if (!totalAlunosCardEl) return;
+        
+        totalAlunosCardEl.textContent = alunos.length;
+        
+        const inscricoesResponse = await fetch(`${API_URL}/inscricoes`);
+        const inscricoes = await inscricoesResponse.json();
+        
+        const alunosComInscricaoAtiva = new Set();
+        inscricoes.forEach(insc => {
+            if (insc.status === 'ATIVA') {
+                const alunoId = typeof insc.aluno === 'object' ? insc.aluno.id : insc.aluno;
+                alunosComInscricaoAtiva.add(alunoId);
+            }
+        });
+        alunosAtivosEl.textContent = alunosComInscricaoAtiva.size;
+        
+        alunosNovosEl.textContent = alunos.length;
+        
+    } catch (error) {
+        console.error('Erro ao atualizar estatísticas:', error);
     }
 }
 
@@ -214,29 +232,43 @@ async function verDetalhesAluno(id) {
     }
 }
 
-// ========== CURSOS ==========
+
 async function carregarCursos() {
     try {
         const response = await fetch(`${API_URL}/cursos`);
+        if (!response.ok) {
+            throw new Error('Erro ao buscar cursos');
+        }
         const cursos = await response.json();
         
         const listaCursos = document.getElementById('listaCursos');
+        if (!listaCursos) return;
+        
         listaCursos.innerHTML = '';
         
-        if (cursos.length === 0) {
-            listaCursos.innerHTML = '<p class="alert alert-info">Nenhum curso cadastrado.</p>';
+        if (!cursos || cursos.length === 0) {
+            listaCursos.innerHTML = `
+                <div class="empty-state">
+                    <h3>Nenhum curso cadastrado</h3>
+                    <p>Clique no botão "Novo Curso" acima para começar a adicionar cursos à plataforma.</p>
+                </div>
+            `;
             return;
         }
         
         cursos.forEach(curso => {
+            const instrutorInfo = curso.instrutor ? 
+                `<p><strong>Instrutor:</strong> ${curso.instrutor.nome || 'Não informado'}</p>` : '';
+            
             const div = document.createElement('div');
             div.className = 'data-item';
             div.innerHTML = `
                 <h4>${curso.nome}</h4>
                 <p>${curso.descricao || 'Sem descrição'}</p>
-                <p><strong>Preço:</strong> R$ ${curso.preco.toFixed(2)}</p>
-                <p><strong>Carga Horária:</strong> ${curso.cargaHoraria}h</p>
-                <p><strong>Vagas:</strong> ${curso.vagas}</p>
+                <p><strong>Preço:</strong> R$ ${(curso.preco || 0).toFixed(2)}</p>
+                <p><strong>Carga Horária:</strong> ${curso.cargaHoraria || 0}h</p>
+                <p><strong>Limite de Vagas:</strong> ${curso.limiteVagas || 'Ilimitado'}</p>
+                ${instrutorInfo}
                 <p><strong>Status:</strong> 
                     <span class="badge ${curso.ativo ? 'badge-success' : 'badge-danger'}">
                         ${curso.ativo ? 'Ativo' : 'Inativo'}
@@ -251,7 +283,10 @@ async function carregarCursos() {
         });
     } catch (error) {
         console.error('Erro ao carregar cursos:', error);
-        showAlert('Erro ao carregar cursos', 'error');
+        const listaCursos = document.getElementById('listaCursos');
+        if (listaCursos) {
+            listaCursos.innerHTML = '<p class="alert alert-danger">Erro ao carregar cursos</p>';
+        }
     }
 }
 
@@ -331,7 +366,6 @@ async function verDetalhesCurso(id) {
     }
 }
 
-// ========== INSTRUTORES ==========
 async function carregarInstrutores() {
     try {
         const response = await fetch(`${API_URL}/instrutores`);
@@ -416,7 +450,6 @@ async function deletarInstrutor(id) {
     }
 }
 
-// ========== INSCRIÇÕES ==========
 async function carregarInscricoes() {
     try {
         const response = await fetch(`${API_URL}/inscricoes`);
@@ -499,7 +532,7 @@ async function processarPagamento(inscricaoId) {
     }
     
     try {
-        // Buscar o alunoId da inscrição
+        
         const inscResponse = await fetch(`${API_URL}/inscricoes/${inscricaoId}`);
         const inscricao = await inscResponse.json();
         
@@ -525,7 +558,6 @@ async function cancelarInscricao(inscricaoId) {
     if (!confirm('Deseja realmente cancelar esta inscrição?')) return;
     
     try {
-        // Buscar o alunoId da inscrição
         const inscResponse = await fetch(`${API_URL}/inscricoes/${inscricaoId}`);
         const inscricao = await inscResponse.json();
         
@@ -585,7 +617,6 @@ async function verDetalhesInscricao(id) {
     }
 }
 
-// ========== FUNÇÕES AUXILIARES ==========
 async function carregarInstrutoresSelect() {
     try {
         const response = await fetch(`${API_URL}/instrutores`);
@@ -688,11 +719,11 @@ function redirectToLoginWithMessage(message, type = 'info', extras = {}) {
     window.location.href = query ? `login.html?${query}` : 'login.html';
 }
 
-// Inicialização
+
 document.addEventListener('DOMContentLoaded', () => {
     carregarDashboard();
     
-    // Fechar modal ao clicar fora
+    
     window.onclick = function(event) {
         if (event.target.classList.contains('modal')) {
             event.target.classList.remove('active');

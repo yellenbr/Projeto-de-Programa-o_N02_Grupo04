@@ -37,7 +37,7 @@ body {
     flex-direction: column;
 }
 
-/* Header */
+
 header {
     background: linear-gradient(135deg, #2563eb 0%, #0891b2 100%);
     color: white;
@@ -62,7 +62,7 @@ header p {
     font-weight: 400;
 }
 
-/* Menu de Navegação */
+
 .menu {
     display: flex;
     background: white;
@@ -105,7 +105,7 @@ header p {
     font-weight: 600;
 }
 
-/* Seções de Conteúdo */
+
 .content-section {
     display: none;
     padding: 2rem;
@@ -134,7 +134,7 @@ header p {
     gap: 0.75rem;
 }
 
-/* Dashboard Stats */
+
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -181,7 +181,7 @@ header p {
     font-weight: 500;
 }
 
-/* Seções de Informação */
+
 .section-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -239,7 +239,7 @@ header p {
     font-weight: 600;
 }
 
-/* Botões de Ação */
+
 .actions {
     margin-bottom: 1.5rem;
     display: flex;
@@ -311,7 +311,7 @@ header p {
     background: #d97706;
 }
 
-/* Lista de Dados */
+
 .data-list {
     display: grid;
     gap: 1rem;
@@ -390,7 +390,7 @@ header p {
     color: #1e40af;
 }
 
-/* Modal */
+
 .modal {
     display: none;
     position: fixed;
@@ -470,7 +470,7 @@ header p {
     border-color: var(--primary-color);
 }
 
-/* Empty State */
+
 .empty-state {
     text-align: center;
     padding: 3rem 1.5rem;
@@ -497,7 +497,7 @@ header p {
     margin-bottom: 1.5rem;
 }
 
-/* Footer */
+
 footer {
     background: var(--dark);
     color: white;
@@ -507,7 +507,7 @@ footer {
     font-size: 0.875rem;
 }
 
-/* Loading Spinner */
+
 .loading {
     display: inline-block;
     width: 20px;
@@ -522,7 +522,7 @@ footer {
     to { transform: rotate(360deg); }
 }
 
-/* Responsive */
+
 @media (max-width: 1024px) {
     .content-section {
         padding: 1.5rem;
@@ -644,7 +644,7 @@ footer {
     }
 }
 
-/* Alertas */
+
 .alert {
     padding: 15px;
     border-radius: 8px;
