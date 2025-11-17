@@ -47,7 +47,7 @@ Sistema completo de gerenciamento de cursos online que permite:
 1. **Clone o repositório**
 ```bash
 git clone https://github.com/yellenbr/Projeto-de-Programa-o_N02_Grupo04.git
-cd Projeto-de-Programa-o_N02_Grupo04/plataformacursos/plataformacursos
+cd Projeto-de-Programa-o_N02_Grupo04/src/plataformacursos
 ```
 
 2. **Compile o projeto**
